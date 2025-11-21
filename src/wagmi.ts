@@ -1,16 +1,9 @@
 import { getDefaultConfig } from '@rainbow-me/rainbowkit';
-import {
-  mainnet,
-  polygon,
-  optimism,
-  arbitrum,
-  base,
-  sepolia,
-} from 'wagmi/chains';
+import { mainnet, sepolia } from 'wagmi/chains';
 
 export const config = getDefaultConfig({
-  appName: 'Web3 Wallet Balance',
-  projectId: 'YOUR_PROJECT_ID',
-  chains: [mainnet, polygon, optimism, arbitrum, base, sepolia],
+  appName: 'Morpho Smart Wallet Interface',
+  projectId: import.meta.env.VITE_WALLETCONNECT_PROJECT_ID || 'YOUR_PROJECT_ID',
+  chains: [sepolia, mainnet],
   ssr: false,
 });
