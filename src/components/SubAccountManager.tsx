@@ -72,7 +72,8 @@ export function SubAccountManager() {
       setSuccessMessage('Transaction proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
       console.error('Error proposing role grant:', error)
-      alert('Failed to propose transaction. Make sure you are a Safe signer.')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to propose transaction'
+      alert(`Failed to propose transaction. ${errorMsg}`)
     }
   }
 

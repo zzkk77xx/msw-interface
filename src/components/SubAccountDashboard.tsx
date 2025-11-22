@@ -16,11 +16,11 @@ export function SubAccountDashboard() {
   const [timeRemaining, setTimeRemaining] = useState<string>('')
 
   // Read limits and windows using hooks
-  const { data: limits } = useSubAccountLimits(address)
+  const { data: limits } = useSubAccountLimits(address as `0x${string}` | undefined)
   const { data: portfolioValue } = usePortfolioValue()
-  const { data: depositWindow } = useDepositWindow(address)
-  const { data: withdrawWindow } = useWithdrawWindow(address)
-  const { data: transferWindow } = useTransferWindow(address)
+  const { data: depositWindow } = useDepositWindow(address as `0x${string}` | undefined)
+  const { data: withdrawWindow } = useWithdrawWindow(address as `0x${string}` | undefined)
+  const { data: transferWindow } = useTransferWindow(address as `0x${string}` | undefined)
 
   // Calculate time remaining until window resets
   useEffect(() => {

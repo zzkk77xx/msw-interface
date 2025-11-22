@@ -7,6 +7,7 @@ import App from './App.tsx'
 import { config } from './wagmi.ts'
 import { ContractAddressProvider } from './contexts/ContractAddressContext.tsx'
 import { ThemeProvider } from './contexts/ThemeContext.tsx'
+import { SafeContextProvider } from './contexts/SafeContext.tsx'
 
 import '@rainbow-me/rainbowkit/styles.css'
 import './index.css'
@@ -20,7 +21,9 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
         <QueryClientProvider client={queryClient}>
           <RainbowKitProvider>
             <ContractAddressProvider>
-              <App />
+              <SafeContextProvider>
+                <App />
+              </SafeContextProvider>
             </ContractAddressProvider>
           </RainbowKitProvider>
         </QueryClientProvider>
