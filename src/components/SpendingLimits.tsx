@@ -1,11 +1,12 @@
 import { useState } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi'
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
 import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
+import { useSubAccountLimits } from '@/hooks/useSafe'
 
 interface SpendingLimitsProps {
   subAccountAddress: `0x${string}`
@@ -14,13 +15,8 @@ interface SpendingLimitsProps {
 export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
   const { addresses } = useContractAddresses()
 
-  // Read current limits
-  const { data: currentLimits } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getSubAccountLimits',
-    args: [subAccountAddress],
-  })
+  // Read current limits using hook
+  const { data: currentLimits } = useSubAccountLimits(subAccountAddress)
 
   const [depositLimit, setDepositLimit] = useState('10') // Default 10%
   const [withdrawLimit, setWithdrawLimit] = useState('10') // Default 10%

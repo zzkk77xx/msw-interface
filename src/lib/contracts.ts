@@ -43,7 +43,7 @@ export const DEFI_INTERACTOR_ABI = [
   },
   {
     inputs: [],
-    name: 'paused',
+    name: 'target',
     outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
     type: 'function'
@@ -161,14 +161,14 @@ export const DEFI_INTERACTOR_ABI = [
   // Emergency Controls (Safe only)
   {
     inputs: [],
-    name: 'pause',
+    name: 'setTarget',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
   },
   {
     inputs: [],
-    name: 'unpause',
+    name: 'unsetTarget',
     outputs: [],
     stateMutability: 'nonpayable',
     type: 'function'
@@ -323,7 +323,7 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: true, name: 'by', type: 'address' },
       { indexed: false, name: 'timestamp', type: 'uint256' }
     ],
-    name: 'EmergencyPaused',
+    name: 'TargetSet',
     type: 'event'
   },
   {
@@ -332,7 +332,7 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: true, name: 'by', type: 'address' },
       { indexed: false, name: 'timestamp', type: 'uint256' }
     ],
-    name: 'EmergencyUnpaused',
+    name: 'TargetUnset',
     type: 'event'
   },
   {
@@ -429,12 +429,6 @@ export const DEFI_INTERACTOR_ABI = [
     type: 'event'
   }
 ] as const
-
-// Contract addresses - update these with your deployed addresses
-export const CONTRACT_ADDRESSES = {
-  DEFI_INTERACTOR: (import.meta.env.VITE_DEFI_INTERACTOR_ADDRESS || '0x') as `0x${string}`,
-  SAFE: (import.meta.env.VITE_SAFE_ADDRESS || '0x') as `0x${string}`,
-} as const
 
 // Role constants
 export const ROLES = {

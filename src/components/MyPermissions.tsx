@@ -1,32 +1,20 @@
 import { useState } from 'react'
-import { useAccount, useReadContract } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
-import { DEFI_INTERACTOR_ABI, ROLES, ROLE_NAMES, ROLE_DESCRIPTIONS } from '@/lib/contracts'
+import { ROLES, ROLE_NAMES, ROLE_DESCRIPTIONS } from '@/lib/contracts'
 import { PROTOCOLS } from '@/lib/protocols'
 import { SubAccountDashboard } from '@/components/SubAccountDashboard'
-import { useContractAddresses } from '@/contexts/ContractAddressContext'
+import { useHasRole, useIsAddressAllowed } from '@/hooks/useSafe'
 
 export function MyPermissions() {
   const { address, isConnected } = useAccount()
-  const { addresses } = useContractAddresses()
   const [showProtocols, setShowProtocols] = useState(false)
 
   // Check which roles the connected address has
-  const { data: hasDepositRole } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'hasRole',
-    args: address ? [address, ROLES.DEFI_DEPOSIT_ROLE] : undefined,
-  })
-
-  const { data: hasWithdrawRole } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'hasRole',
-    args: address ? [address, ROLES.DEFI_WITHDRAW_ROLE] : undefined,
-  })
+  const { data: hasDepositRole } = useHasRole(address, ROLES.DEFI_DEPOSIT_ROLE)
+  const { data: hasWithdrawRole } = useHasRole(address, ROLES.DEFI_WITHDRAW_ROLE)
 
   if (!isConnected) {
     return (
@@ -152,25 +140,14 @@ interface ProtocolAccessProps {
 
 function ProtocolAccess({ protocol, subAccount }: ProtocolAccessProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { addresses } = useContractAddresses()
 
   // Check if protocol contract is allowed
-  const { data: protocolAllowed } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'allowedAddresses',
-    args: [subAccount, protocol.contractAddress],
-  })
+  const { data: protocolAllowed } = useIsAddressAllowed(subAccount, protocol.contractAddress)
 
   // Count allowed pools
   const poolChecks = protocol.pools.map(pool => {
     // eslint-disable-next-line react-hooks/rules-of-hooks
-    const { data: isAllowed } = useReadContract({
-      address: addresses.defiInteractor,
-      abi: DEFI_INTERACTOR_ABI,
-      functionName: 'allowedAddresses',
-      args: [subAccount, pool.address],
-    })
+    const { data: isAllowed } = useIsAddressAllowed(subAccount, pool.address)
     return { pool, isAllowed }
   })
 

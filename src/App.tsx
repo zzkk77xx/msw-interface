@@ -1,26 +1,15 @@
 import { ConnectButton } from '@rainbow-me/rainbowkit'
-import { useAccount, useReadContract } from 'wagmi'
 import { SafeStatus } from '@/components/SafeStatus'
 import { SubAccountManager } from '@/components/SubAccountManager'
 import { EmergencyControls } from '@/components/EmergencyControls'
 import { MyPermissions } from '@/components/MyPermissions'
 import { ContractSetup } from '@/components/ContractSetup'
-import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
+import { useIsSafeOwner } from '@/hooks/useSafe'
 
 function App() {
-  const { address: connectedAddress } = useAccount()
-  const { addresses, isConfigured } = useContractAddresses()
-
-  // Check if connected address is the Safe owner
-  const { data: safeAddress } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'safe',
-  })
-
-  const isSafeOwner = connectedAddress && safeAddress &&
-    connectedAddress.toLowerCase() === safeAddress.toLowerCase()
+  const { isConfigured } = useContractAddresses()
+  const { isSafeOwner } = useIsSafeOwner()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">

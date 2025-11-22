@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useAccount, useWriteContract, useWaitForTransactionReceipt, useReadContract } from 'wagmi'
+import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -9,25 +9,16 @@ import { DEFI_INTERACTOR_ABI, ROLES, ROLE_NAMES, ROLE_DESCRIPTIONS } from '@/lib
 import { ProtocolPermissions } from '@/components/ProtocolPermissions'
 import { SpendingLimits } from '@/components/SpendingLimits'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
+import { useIsSafeOwner, useHasRole } from '@/hooks/useSafe'
 import { isAddress } from 'viem'
 
 export function SubAccountManager() {
-  const { address: connectedAddress } = useAccount()
   const { addresses } = useContractAddresses()
+  const { isSafeOwner } = useIsSafeOwner()
   const [newSubAccount, setNewSubAccount] = useState('')
   const [grantDeposit, setGrantDeposit] = useState(false)
   const [grantWithdraw, setGrantWithdraw] = useState(false)
   const [managedAccounts, setManagedAccounts] = useState<Set<`0x${string}`>>(new Set())
-
-  // Read Safe address to check if user is owner
-  const { data: safeAddress } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'safe',
-  })
-
-  const isSafeOwner = connectedAddress && safeAddress &&
-    connectedAddress.toLowerCase() === safeAddress.toLowerCase()
 
   // Write contracts
   const { writeContract: grantRole, data: grantHash, isPending: isGrantPending } = useWriteContract()
@@ -224,22 +215,10 @@ interface SubAccountRowProps {
 
 function SubAccountRow({ account, onRevokeRole, isRevoking }: SubAccountRowProps) {
   const [isExpanded, setIsExpanded] = useState(false)
-  const { addresses } = useContractAddresses()
 
   // Check which roles the account has
-  const { data: hasDepositRole } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'hasRole',
-    args: [account, ROLES.DEFI_DEPOSIT_ROLE],
-  })
-
-  const { data: hasWithdrawRole } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'hasRole',
-    args: [account, ROLES.DEFI_WITHDRAW_ROLE],
-  })
+  const { data: hasDepositRole } = useHasRole(account, ROLES.DEFI_DEPOSIT_ROLE)
+  const { data: hasWithdrawRole } = useHasRole(account, ROLES.DEFI_WITHDRAW_ROLE)
 
   return (
     <div className="border rounded-lg overflow-hidden">

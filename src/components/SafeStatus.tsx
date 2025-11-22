@@ -1,4 +1,4 @@
-import { useAccount, useReadContract } from "wagmi";
+import { useAccount } from "wagmi";
 import {
   Card,
   CardContent,
@@ -7,35 +7,12 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
-import { DEFI_INTERACTOR_ABI } from "@/lib/contracts";
-import { useContractAddresses } from "@/contexts/ContractAddressContext";
+import { useIsSafeOwner, useSafeAddress } from "@/hooks/useSafe";
 
 export function SafeStatus() {
   const { address, isConnected } = useAccount();
-  const { addresses } = useContractAddresses();
-
-  // Read pause status
-  const pausedQuery = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: "paused",
-  });
-  const isPaused = pausedQuery.data;
-  console.log(pausedQuery, isPaused);
-
-  // Read Safe address from contract
-  const safeAddressQuery = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: "safe",
-  });
-  const safeAddress = safeAddressQuery.data;
-  console.log(safeAddressQuery, safeAddress);
-
-  const isSafeOwner =
-    isConnected &&
-    safeAddress &&
-    address?.toLowerCase() === safeAddress.toLowerCase();
+  const { data: safeAddress } = useSafeAddress();
+  const { isSafeOwner } = useIsSafeOwner();
 
   if (!isConnected) {
     return (
@@ -58,13 +35,9 @@ export function SafeStatus() {
             <CardTitle>Safe Status</CardTitle>
             <CardDescription>Morpho Smart Wallet system status</CardDescription>
           </div>
-          {isPaused ? (
-            <Badge variant="destructive">PAUSED</Badge>
-          ) : (
-            <Badge variant="secondary" className="bg-green-100 text-green-800">
-              ACTIVE
-            </Badge>
-          )}
+          <Badge variant="secondary" className="bg-green-100 text-green-800">
+            ACTIVE
+          </Badge>
         </div>
       </CardHeader>
       <CardContent>
@@ -98,17 +71,6 @@ export function SafeStatus() {
             </div>
           </div>
 
-          {isPaused && (
-            <div className="mt-4 p-3 bg-destructive/10 rounded-lg">
-              <p className="text-sm text-destructive font-semibold">
-                ⚠️ Emergency Mode Active
-              </p>
-              <p className="text-xs text-muted-foreground mt-1">
-                All deposit and withdrawal operations are paused. Only Safe
-                owners can unpause the system.
-              </p>
-            </div>
-          )}
         </div>
       </CardContent>
     </Card>

@@ -1,54 +1,26 @@
 import { useState, useEffect } from 'react'
-import { useAccount, useReadContract } from 'wagmi'
+import { useAccount } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
-import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { formatEther } from 'viem'
+import {
+  useSubAccountLimits,
+  usePortfolioValue,
+  useDepositWindow,
+  useWithdrawWindow,
+  useTransferWindow,
+} from '@/hooks/useSafe'
 
 export function SubAccountDashboard() {
   const { address } = useAccount()
-  const { addresses } = useContractAddresses()
   const [timeRemaining, setTimeRemaining] = useState<string>('')
 
-  // Read limits
-  const { data: limits } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getSubAccountLimits',
-    args: address ? [address] : undefined,
-  })
-
-  // Read portfolio value
-  const { data: portfolioValue } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getPortfolioValue',
-  })
-
-  // Read deposit window
-  const { data: depositWindow } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getDepositWindow',
-    args: address ? [address] : undefined,
-  })
-
-  // Read withdraw window
-  const { data: withdrawWindow } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getWithdrawWindow',
-    args: address ? [address] : undefined,
-  })
-
-  // Read transfer window
-  const { data: transferWindow } = useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getTransferWindow',
-    args: address ? [address] : undefined,
-  })
+  // Read limits and windows using hooks
+  const { data: limits } = useSubAccountLimits(address)
+  const { data: portfolioValue } = usePortfolioValue()
+  const { data: depositWindow } = useDepositWindow(address)
+  const { data: withdrawWindow } = useWithdrawWindow(address)
+  const { data: transferWindow } = useTransferWindow(address)
 
   // Calculate time remaining until window resets
   useEffect(() => {

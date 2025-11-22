@@ -46,23 +46,13 @@ export function ContractAddressProvider({ children }: ContractAddressProviderPro
       localStorage.setItem('defiInteractor', defiInteractorParam)
     } else if (savedDefiInteractor && isAddress(savedDefiInteractor)) {
       newAddresses.defiInteractor = savedDefiInteractor as `0x${string}`
-    } else if (import.meta.env.VITE_DEFI_INTERACTOR_ADDRESS) {
-      const envAddress = import.meta.env.VITE_DEFI_INTERACTOR_ADDRESS
-      if (isAddress(envAddress)) {
-        newAddresses.defiInteractor = envAddress as `0x${string}`
-      }
-    }
-
+    } 
+    
     if (safeParam && isAddress(safeParam)) {
       newAddresses.safe = safeParam as `0x${string}`
       localStorage.setItem('safe', safeParam)
     } else if (savedSafe && isAddress(savedSafe)) {
       newAddresses.safe = savedSafe as `0x${string}`
-    } else if (import.meta.env.VITE_SAFE_ADDRESS) {
-      const envAddress = import.meta.env.VITE_SAFE_ADDRESS
-      if (isAddress(envAddress)) {
-        newAddresses.safe = envAddress as `0x${string}`
-      }
     }
 
     setAddresses(newAddresses)
