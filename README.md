@@ -9,6 +9,7 @@ This dApp provides a user-friendly interface for the [Morpho Smart Wallet](../Do
 ### What is Morpho Smart Wallet?
 
 Morpho Smart Wallet solves the DeFi custody trilemma by combining:
+
 - **Security**: Safe multisig retains ultimate control over all assets
 - **Usability**: Sub-accounts can execute daily DeFi operations with single signature
 - **Flexibility**: Role-based permissions with time-windowed cumulative limits
@@ -16,6 +17,7 @@ Morpho Smart Wallet solves the DeFi custody trilemma by combining:
 ## Key Features
 
 ### For Safe Owners
+
 - Connect Safe multisig wallet
 - View Safe balance and DeFi positions
 - Create and manage sub-accounts
@@ -25,6 +27,7 @@ Morpho Smart Wallet solves the DeFi custody trilemma by combining:
 - View transaction history and alerts
 
 ### For Sub-Accounts
+
 - Connect as authorized sub-account
 - Deposit to Morpho Vaults (up to 10% of Safe balance per 24h)
 - Withdraw from Morpho Vaults (up to 5% of position per 24h)
@@ -34,6 +37,7 @@ Morpho Smart Wallet solves the DeFi custody trilemma by combining:
 ## Security Model
 
 ### Limits and Protection
+
 - **Deposit Limit**: 10% of Safe balance per 24-hour rolling window
 - **Withdrawal Limit**: 5% of vault position per 24-hour rolling window
 - **Slippage Protection**: All operations require min/max share parameters
@@ -41,6 +45,7 @@ Morpho Smart Wallet solves the DeFi custody trilemma by combining:
 - **Emergency Pause**: Safe owners can freeze all operations instantly
 
 ### Permission Roles
+
 1. **DEFI_DEPOSIT_ROLE** (Role ID: 1): Can deposit to Morpho Vaults
 2. **DEFI_WITHDRAW_ROLE** (Role ID: 2): Can withdraw from Morpho Vaults
 
@@ -68,10 +73,6 @@ Create a `.env` file:
 
 ```env
 VITE_WALLETCONNECT_PROJECT_ID=your_project_id_here
-VITE_SAFE_ADDRESS=0x...
-VITE_DEFI_INTERACTOR_ADDRESS=0x...
-VITE_SMART_WALLET_ADDRESS=0x...
-VITE_ZODIAC_ROLES_ADDRESS=0x...
 ```
 
 ## Development
@@ -103,22 +104,26 @@ pnpm preview
 ### As a Safe Owner
 
 1. **Connect Your Safe**
+
    - Click "Connect Wallet"
    - Select your Safe multisig address
    - Ensure you have signer permissions
 
 2. **View Dashboard**
+
    - See Safe USDC balance
    - View vault positions and shares
    - Monitor all sub-account activity
 
 3. **Create Sub-Account**
+
    - Navigate to "Sub-Accounts" tab
    - Enter sub-account address (any Ethereum address)
    - Select roles to grant (Deposit and/or Withdraw)
    - Confirm transaction (requires Safe signatures)
 
 4. **Monitor Activity**
+
    - View real-time deposits and withdrawals
    - See cumulative limits usage
    - Receive unusual activity alerts (>8% deposits, >4% withdrawals)
@@ -131,15 +136,18 @@ pnpm preview
 ### As a Sub-Account
 
 1. **Connect Wallet**
+
    - Connect with your authorized address
    - View your assigned roles and limits
 
 2. **Deposit to Vault**
+
    - Enter deposit amount (max 10% of Safe balance per 24h)
    - Set slippage tolerance
    - Execute transaction (single signature)
 
 3. **Withdraw from Vault**
+
    - Enter withdrawal amount (max 5% of position per 24h)
    - Set slippage tolerance
    - Execute transaction (single signature)
@@ -154,17 +162,20 @@ pnpm preview
 This dApp integrates with three core contracts:
 
 ### DeFiInteractor.sol
+
 - Enforces cumulative limits
 - Executes vault deposits/withdrawals
 - Emits comprehensive events
 - Provides pause mechanism
 
 ### SmartWallet.sol
+
 - Manages sub-account whitelist
 - Handles protocol whitelisting
 - Executes delegated transactions
 
 ### Zodiac Roles
+
 - Role-based access control
 - Validates permissions before execution
 - Forwards calls to Safe
@@ -248,17 +259,20 @@ msw-interface/
 ## Troubleshooting
 
 ### Connection Issues
+
 - Ensure your Safe is on the correct network
 - Verify Zodiac Roles module is enabled
 - Check that contracts are deployed
 
 ### Transaction Failures
+
 - "Unauthorized": Sub-account doesn't have required role
 - "ExceedsDepositLimit": Exceeds 10% cumulative limit in 24h window
 - "ExceedsWithdrawLimit": Exceeds 5% cumulative limit in 24h window
 - "Paused": System is in emergency pause mode
 
 ### Limit Calculations
+
 - Limits are based on balance/position at window start (not current)
 - Each sub-account has independent 24h windows
 - Windows reset automatically after 24 hours

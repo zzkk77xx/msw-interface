@@ -44,13 +44,6 @@ export const DEFI_INTERACTOR_ABI = [
   {
     inputs: [],
     name: 'target',
-    outputs: [{ name: '', type: 'bool' }],
-    stateMutability: 'view',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'safe',
     outputs: [{ name: '', type: 'address' }],
     stateMutability: 'view',
     type: 'function'
@@ -158,21 +151,6 @@ export const DEFI_INTERACTOR_ABI = [
     type: 'function'
   },
 
-  // Emergency Controls (Safe only)
-  {
-    inputs: [],
-    name: 'setTarget',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function'
-  },
-  {
-    inputs: [],
-    name: 'unsetTarget',
-    outputs: [],
-    stateMutability: 'nonpayable',
-    type: 'function'
-  },
 
   // Oracle Management (Safe only)
   {
@@ -315,24 +293,6 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'timestamp', type: 'uint256' }
     ],
     name: 'RoleRevoked',
-    type: 'event'
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'by', type: 'address' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
-    ],
-    name: 'TargetSet',
-    type: 'event'
-  },
-  {
-    anonymous: false,
-    inputs: [
-      { indexed: true, name: 'by', type: 'address' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
-    ],
-    name: 'TargetUnset',
     type: 'event'
   },
   {
