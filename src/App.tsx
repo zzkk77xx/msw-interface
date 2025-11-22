@@ -7,10 +7,12 @@ import { ContractSetup } from '@/components/ContractSetup'
 import { ThemeToggle } from '@/components/ThemeToggle'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { useIsSafeOwner } from '@/hooks/useSafe'
+import { useAccount } from 'wagmi'
 
 function App() {
   const { isConfigured } = useContractAddresses()
   const { isSafeOwner } = useIsSafeOwner()
+  const { isConnected } = useAccount()
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100 dark:from-slate-900 dark:to-slate-800">
@@ -40,7 +42,7 @@ function App() {
             <div className="max-w-2xl mx-auto">
               <ContractSetup />
             </div>
-          ) : isSafeOwner ? (
+          ) : isSafeOwner && isConnected ? (
             /* Safe Owner View */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Status and Emergency */}
@@ -55,7 +57,7 @@ function App() {
                 <SubAccountManager />
               </div>
             </div>
-          ) : (
+          ) : isConnected ? (
             /* Sub-Account / External View */
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
               {/* Left Column - Status */}
@@ -67,6 +69,17 @@ function App() {
               {/* Right Column - My Permissions */}
               <div className="lg:col-span-2">
                 <MyPermissions />
+              </div>
+            </div>
+          ) : (
+            /* Not Connected */
+            <div className="max-w-2xl mx-auto text-center py-12">
+              <div className="bg-card rounded-lg border p-8">
+                <h2 className="text-2xl font-semibold mb-3">Welcome to DeFi Smart Wallet</h2>
+                <p className="text-muted-foreground mb-6">
+                  Please connect your wallet to view and manage your DeFi permissions.
+                </p>
+                <ConnectButton />
               </div>
             </div>
           )}
