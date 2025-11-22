@@ -1,0 +1,12 @@
+node_modules
+.next
+.vscode
+.DS_Store
+dist
+build
+coverage
+*.md
+*.json
+*.yaml
+*.yml
+*.html
