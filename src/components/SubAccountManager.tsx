@@ -8,7 +8,7 @@ import { DEFI_INTERACTOR_ABI, ROLES, ROLE_NAMES, ROLE_DESCRIPTIONS } from '@/lib
 import { ProtocolPermissions } from '@/components/ProtocolPermissions'
 import { SpendingLimits } from '@/components/SpendingLimits'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
-import { useIsSafeOwner, useHasRole } from '@/hooks/useSafe'
+import { useIsSafeOwner, useHasRole, useManagedAccounts } from '@/hooks/useSafe'
 import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
 import { isAddress } from 'viem'
 
@@ -18,8 +18,10 @@ export function SubAccountManager() {
   const [newSubAccount, setNewSubAccount] = useState('')
   const [grantDeposit, setGrantDeposit] = useState(false)
   const [grantWithdraw, setGrantWithdraw] = useState(false)
-  const [managedAccounts, setManagedAccounts] = useState<Set<`0x${string}`>>(new Set())
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+
+  // Fetch managed accounts from contract
+  const { accounts: managedAccounts, isLoading: isLoadingAccounts, refetch } = useManagedAccounts()
 
   // Use Safe proposal hook
   const { proposeTransaction, isPending, error } = useSafeProposal()
@@ -62,8 +64,8 @@ export function SubAccountManager() {
       const result = await proposeTransaction(transactions.length === 1 ? transactions[0] : transactions)
 
       if (result.success) {
-        // Add to managed list
-        setManagedAccounts(prev => new Set(prev).add(newSubAccount))
+        // Refresh the managed accounts list from contract
+        refetch()
 
         // Reset form
         setNewSubAccount('')
@@ -98,6 +100,9 @@ export function SubAccountManager() {
       })
 
       if (result.success) {
+        // Refresh the managed accounts list from contract
+        refetch()
+
         setSuccessMessage(
           `Role revoked successfully! Transaction hash: ${result.transactionHash}`
         )
@@ -198,16 +203,18 @@ export function SubAccountManager() {
           <CardDescription>View and manage existing sub-accounts</CardDescription>
         </CardHeader>
         <CardContent>
-          {managedAccounts.size === 0 ? (
+          {isLoadingAccounts ? (
+            <p className="text-sm text-muted-foreground">Loading managed accounts...</p>
+          ) : managedAccounts.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              No sub-accounts added yet. Add one above to get started.
+              No sub-accounts found. Add one above to get started.
             </p>
           ) : (
             <div className="space-y-3">
-              {Array.from(managedAccounts).map(account => (
+              {managedAccounts.map(account => (
                 <SubAccountRow
-                  key={account}
-                  account={account}
+                  key={account.address}
+                  account={account.address}
                   onRevokeRole={handleRevokeRole}
                   isRevoking={isPending}
                 />
