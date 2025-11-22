@@ -99,17 +99,22 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
         [subAccountAddress, allowedAddresses, true]
       )
 
-      await proposeTransaction({
+      const result = await proposeTransaction({
         to: addresses.defiInteractor,
         data,
       })
 
-      setSuccessMessage(
-        'Protocol permissions proposed to Safe multisig. Other signers need to approve it.'
-      )
+      if (result.success) {
+        setSuccessMessage(
+          `Protocol permissions set successfully! Transaction hash: ${result.transactionHash}`
+        )
+      } else {
+        throw result.error || new Error('Transaction failed')
+      }
     } catch (error) {
       console.error('Error proposing permissions:', error)
-      alert('Failed to propose transaction. Make sure you are a Safe signer.')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to propose transaction'
+      alert(`Failed to propose transaction. ${errorMsg}`)
     }
   }
 

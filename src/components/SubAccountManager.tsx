@@ -47,30 +47,33 @@ export function SubAccountManager() {
       if (grantDeposit) rolesToGrant.push(ROLES.DEFI_DEPOSIT_ROLE)
       if (grantWithdraw) rolesToGrant.push(ROLES.DEFI_WITHDRAW_ROLE)
 
-      // Propose each role grant as a separate transaction to the Safe
-      for (const roleId of rolesToGrant) {
-        const data = encodeContractCall(
+      // Create an array of transactions to batch them
+      const transactions = rolesToGrant.map(roleId => ({
+        to: addresses.defiInteractor,
+        data: encodeContractCall(
           addresses.defiInteractor,
           DEFI_INTERACTOR_ABI,
           'grantRole',
           [newSubAccount, roleId]
-        )
+        ),
+      }))
 
-        await proposeTransaction({
-          to: addresses.defiInteractor,
-          data,
-        })
+      // Propose transactions to the Safe (batched if multiple)
+      const result = await proposeTransaction(transactions.length === 1 ? transactions[0] : transactions)
+
+      if (result.success) {
+        // Add to managed list
+        setManagedAccounts(prev => new Set(prev).add(newSubAccount))
+
+        // Reset form
+        setNewSubAccount('')
+        setGrantDeposit(false)
+        setGrantWithdraw(false)
+
+        setSuccessMessage(`Transaction executed successfully! Hash: ${result.transactionHash}`)
+      } else {
+        throw result.error || new Error('Transaction failed')
       }
-
-      // Add to managed list
-      setManagedAccounts(prev => new Set(prev).add(newSubAccount))
-
-      // Reset form
-      setNewSubAccount('')
-      setGrantDeposit(false)
-      setGrantWithdraw(false)
-
-      setSuccessMessage('Transaction proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
       console.error('Error proposing role grant:', error)
       const errorMsg = error instanceof Error ? error.message : 'Failed to propose transaction'
@@ -89,17 +92,22 @@ export function SubAccountManager() {
         roleId,
       ])
 
-      await proposeTransaction({
+      const result = await proposeTransaction({
         to: addresses.defiInteractor,
         data,
       })
 
-      setSuccessMessage(
-        'Revoke transaction proposed to Safe multisig. Other signers need to approve it.'
-      )
+      if (result.success) {
+        setSuccessMessage(
+          `Role revoked successfully! Transaction hash: ${result.transactionHash}`
+        )
+      } else {
+        throw result.error || new Error('Transaction failed')
+      }
     } catch (error) {
       console.error('Error proposing role revoke:', error)
-      alert('Failed to propose transaction. Make sure you are a Safe signer.')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to propose transaction'
+      alert(`Failed to propose transaction. ${errorMsg}`)
     }
   }
 

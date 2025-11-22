@@ -73,17 +73,22 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
         ]
       )
 
-      await proposeTransaction({
+      const result = await proposeTransaction({
         to: addresses.defiInteractor,
         data,
       })
 
-      setSuccessMessage(
-        'Spending limits proposed to Safe multisig. Other signers need to approve it.'
-      )
+      if (result.success) {
+        setSuccessMessage(
+          `Spending limits set successfully! Transaction hash: ${result.transactionHash}`
+        )
+      } else {
+        throw result.error || new Error('Transaction failed')
+      }
     } catch (error) {
       console.error('Error proposing limits:', error)
-      alert('Failed to propose transaction. Make sure you are a Safe signer.')
+      const errorMsg = error instanceof Error ? error.message : 'Failed to propose transaction'
+      alert(`Failed to propose transaction. ${errorMsg}`)
     }
   }
 

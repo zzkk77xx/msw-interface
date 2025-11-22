@@ -1,6 +1,10 @@
 import { useCallback, useState } from 'react';
 import { Address, encodeFunctionData } from 'viem';
-import { useAccount, useWalletClient } from 'wagmi';
+import { useAccount, useWalletClient, usePublicClient } from 'wagmi';
+import Safe from '@safe-global/protocol-kit';
+import { MetaTransactionData } from '@safe-global/safe-core-sdk-types';
+import { createEip1193Provider } from '@/lib/viemToEip1193';
+import { useSafeAddress } from './useSafe';
 
 interface TransactionRequest {
   to: Address;
@@ -40,45 +44,84 @@ export function encodeContractCall(
 
 export function useSafeProposal() {
   const { data: walletClient } = useWalletClient();
+  const publicClient = usePublicClient();
   const { address } = useAccount();
+  const { data: safeAddress } = useSafeAddress();
   const [isPending, setIsPending] = useState(false);
   const [error, setError] = useState<Error | null>(null);
 
   const proposeTransaction = useCallback(
-    async (transactions: TransactionRequest[]) => {
+    async (transaction: TransactionRequest | TransactionRequest[]) => {
       if (!walletClient || !address) {
         throw new Error('Wallet not connected');
+      }
+
+      if (!safeAddress) {
+        throw new Error('Safe address not found');
+      }
+
+      if (!publicClient) {
+        throw new Error('Public client not available');
       }
 
       setIsPending(true);
       setError(null);
 
       try {
-        // In a real implementation, this would create a Safe transaction
-        // For now, we'll simulate the transaction execution directly
-        for (const tx of transactions) {
-          const { to, value = 0n, data } = tx;
+        // Create EIP-1193 provider from viem clients
+        const provider = createEip1193Provider(publicClient, walletClient);
 
-          const hash = await walletClient.sendTransaction({
-            to,
-            value,
-            data,
-            account: address,
-          });
+        // Initialize Safe Protocol Kit with signer
+        const protocolKit = await Safe.init({
+          provider,
+          safeAddress: safeAddress as string,
+          signer: address,
+        });
 
-          console.log('Transaction sent:', { hash });
-        }
+        // Convert transactions to Safe format
+        const transactions = Array.isArray(transaction) ? transaction : [transaction];
+        const safeTransactions: MetaTransactionData[] = transactions.map((tx) => ({
+          to: tx.to,
+          value: (tx.value || 0n).toString(),
+          data: tx.data,
+        }));
 
-        return { success: true };
+        // Create Safe transaction
+        const safeTransaction = await protocolKit.createTransaction({
+          transactions: safeTransactions,
+        });
+
+        // Get transaction hash
+        const safeTxHash = await protocolKit.getTransactionHash(safeTransaction);
+        console.log('Safe transaction hash:', safeTxHash);
+
+        // Sign the transaction
+        const signedTransaction = await protocolKit.signTransaction(safeTransaction);
+        console.log('Transaction signed');
+
+        // Execute the transaction
+        const executeTxResponse = await protocolKit.executeTransaction(signedTransaction);
+        console.log('Transaction executed:', executeTxResponse);
+
+        // Get transaction hash from response
+        const txHash = executeTxResponse.hash;
+        console.log('Transaction hash:', txHash);
+
+        return {
+          success: true,
+          safeTxHash,
+          transactionHash: txHash
+        };
       } catch (err) {
-        console.error('Transaction failed:', err);
-        setError(err instanceof Error ? err : new Error('Transaction failed'));
+        console.error('Safe transaction failed:', err);
+        const errorMessage = err instanceof Error ? err.message : 'Transaction failed';
+        setError(err instanceof Error ? err : new Error(errorMessage));
         return { success: false, error: err };
       } finally {
         setIsPending(false);
       }
     },
-    [walletClient, address]
+    [walletClient, address, safeAddress, publicClient]
   );
 
   return {
