@@ -6,54 +6,54 @@ export const DEFI_INTERACTOR_ABI = [
     name: 'DEFI_DEPOSIT_ROLE',
     outputs: [{ name: '', type: 'uint16' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'DEFI_WITHDRAW_ROLE',
     outputs: [{ name: '', type: 'uint16' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'DEFI_EXECUTE_ROLE',
     outputs: [{ name: '', type: 'uint16' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'DEFI_TRANSFER_ROLE',
     outputs: [{ name: '', type: 'uint16' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
 
   // Read Functions
   {
     inputs: [
       { name: 'member', type: 'address' },
-      { name: 'roleId', type: 'uint16' }
+      { name: 'roleId', type: 'uint16' },
     ],
     name: 'hasRole',
     outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'target',
     outputs: [{ name: '', type: 'address' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'priceOracle',
     outputs: [{ name: '', type: 'address' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'subAccount', type: 'address' }],
@@ -62,95 +62,94 @@ export const DEFI_INTERACTOR_ABI = [
       { name: 'maxDepositBps', type: 'uint256' },
       { name: 'maxWithdrawBps', type: 'uint256' },
       { name: 'maxLossBps', type: 'uint256' },
-      { name: 'windowDuration', type: 'uint256' }
+      { name: 'windowDuration', type: 'uint256' },
     ],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'getPortfolioValue',
     outputs: [{ name: 'totalValue', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'getTrackedTokenCount',
     outputs: [{ name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [],
     name: 'getTrackedProtocolCount',
     outputs: [{ name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'subAccount', type: 'address' },
-      { name: 'target', type: 'address' }
+      { name: 'target', type: 'address' },
     ],
     name: 'allowedAddresses',
     outputs: [{ name: '', type: 'bool' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'subAccount', type: 'address' }],
     name: 'getDepositWindow',
     outputs: [
       { name: 'windowStart', type: 'uint256' },
-      { name: 'cumulativeDeposit', type: 'uint256' }
+      { name: 'cumulativeDeposit', type: 'uint256' },
     ],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'subAccount', type: 'address' }],
     name: 'getWithdrawWindow',
     outputs: [
       { name: 'windowStart', type: 'uint256' },
-      { name: 'cumulativeWithdraw', type: 'uint256' }
+      { name: 'cumulativeWithdraw', type: 'uint256' },
     ],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'subAccount', type: 'address' }],
     name: 'getTransferWindow',
     outputs: [
       { name: 'windowStart', type: 'uint256' },
-      { name: 'cumulativeTransfer', type: 'uint256' }
+      { name: 'cumulativeTransfer', type: 'uint256' },
     ],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
   },
 
   // Role Management Functions (Safe only)
   {
     inputs: [
       { name: 'member', type: 'address' },
-      { name: 'roleId', type: 'uint16' }
+      { name: 'roleId', type: 'uint16' },
     ],
     name: 'grantRole',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'member', type: 'address' },
-      { name: 'roleId', type: 'uint16' }
+      { name: 'roleId', type: 'uint16' },
     ],
     name: 'revokeRole',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
-
 
   // Oracle Management (Safe only)
   {
@@ -158,35 +157,35 @@ export const DEFI_INTERACTOR_ABI = [
     name: 'setOracle',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'token', type: 'address' }],
     name: 'addTrackedToken',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'token', type: 'address' }],
     name: 'removeTrackedToken',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'protocol', type: 'address' }],
     name: 'addTrackedProtocol',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [{ name: 'protocol', type: 'address' }],
     name: 'removeTrackedProtocol',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
 
   // Sub-Account Configuration (Safe only)
@@ -196,23 +195,23 @@ export const DEFI_INTERACTOR_ABI = [
       { name: 'maxDepositBps', type: 'uint256' },
       { name: 'maxWithdrawBps', type: 'uint256' },
       { name: 'maxLossBps', type: 'uint256' },
-      { name: 'windowDuration', type: 'uint256' }
+      { name: 'windowDuration', type: 'uint256' },
     ],
     name: 'setSubAccountLimits',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'subAccount', type: 'address' },
       { name: 'targets', type: 'address[]' },
-      { name: 'allowed', type: 'bool' }
+      { name: 'allowed', type: 'bool' },
     ],
     name: 'setAllowedAddresses',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
 
   // Core DeFi Operations (Sub-accounts)
@@ -221,12 +220,12 @@ export const DEFI_INTERACTOR_ABI = [
       { name: 'target', type: 'address' },
       { name: 'assets', type: 'uint256' },
       { name: 'receiver', type: 'address' },
-      { name: 'minShares', type: 'uint256' }
+      { name: 'minShares', type: 'uint256' },
     ],
     name: 'depositTo',
     outputs: [{ name: 'actualShares', type: 'uint256' }],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
@@ -234,44 +233,44 @@ export const DEFI_INTERACTOR_ABI = [
       { name: 'assets', type: 'uint256' },
       { name: 'receiver', type: 'address' },
       { name: 'owner', type: 'address' },
-      { name: 'maxShares', type: 'uint256' }
+      { name: 'maxShares', type: 'uint256' },
     ],
     name: 'withdrawFrom',
     outputs: [{ name: 'actualShares', type: 'uint256' }],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'token', type: 'address' },
       { name: 'recipient', type: 'address' },
-      { name: 'amount', type: 'uint256' }
+      { name: 'amount', type: 'uint256' },
     ],
     name: 'transferToken',
     outputs: [{ name: 'success', type: 'bool' }],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'token', type: 'address' },
       { name: 'target', type: 'address' },
-      { name: 'amount', type: 'uint256' }
+      { name: 'amount', type: 'uint256' },
     ],
     name: 'approveProtocol',
     outputs: [],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
   {
     inputs: [
       { name: 'target', type: 'address' },
-      { name: 'data', type: 'bytes' }
+      { name: 'data', type: 'bytes' },
     ],
     name: 'executeOnProtocol',
     outputs: [{ name: 'result', type: 'bytes' }],
     stateMutability: 'nonpayable',
-    type: 'function'
+    type: 'function',
   },
 
   // Events
@@ -280,20 +279,20 @@ export const DEFI_INTERACTOR_ABI = [
     inputs: [
       { indexed: true, name: 'member', type: 'address' },
       { indexed: true, name: 'roleId', type: 'uint16' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'RoleAssigned',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: 'member', type: 'address' },
       { indexed: true, name: 'roleId', type: 'uint16' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'RoleRevoked',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -306,10 +305,10 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'safeBalanceAfter', type: 'uint256' },
       { indexed: false, name: 'cumulativeInWindow', type: 'uint256' },
       { indexed: false, name: 'percentageOfBalance', type: 'uint256' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'DepositExecuted',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -322,10 +321,10 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'safeSharesAfter', type: 'uint256' },
       { indexed: false, name: 'cumulativeInWindow', type: 'uint256' },
       { indexed: false, name: 'percentageOfPosition', type: 'uint256' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'WithdrawExecuted',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -335,10 +334,10 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'maxWithdrawBps', type: 'uint256' },
       { indexed: false, name: 'maxLossBps', type: 'uint256' },
       { indexed: false, name: 'windowDuration', type: 'uint256' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'SubAccountLimitsSet',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -346,10 +345,10 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: true, name: 'subAccount', type: 'address' },
       { indexed: false, name: 'targets', type: 'address[]' },
       { indexed: false, name: 'allowed', type: 'bool' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'AllowedAddressesSet',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -362,10 +361,10 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'safeBalanceAfter', type: 'uint256' },
       { indexed: false, name: 'cumulativeInWindow', type: 'uint256' },
       { indexed: false, name: 'percentageOfBalance', type: 'uint256' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'TransferExecuted',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
@@ -374,21 +373,21 @@ export const DEFI_INTERACTOR_ABI = [
       { indexed: false, name: 'activityType', type: 'string' },
       { indexed: false, name: 'value', type: 'uint256' },
       { indexed: false, name: 'threshold', type: 'uint256' },
-      { indexed: false, name: 'timestamp', type: 'uint256' }
+      { indexed: false, name: 'timestamp', type: 'uint256' },
     ],
     name: 'UnusualActivity',
-    type: 'event'
+    type: 'event',
   },
   {
     anonymous: false,
     inputs: [
       { indexed: true, name: 'oldOracle', type: 'address' },
-      { indexed: true, name: 'newOracle', type: 'address' }
+      { indexed: true, name: 'newOracle', type: 'address' },
     ],
     name: 'OracleUpdated',
-    type: 'event'
-  }
-] as const
+    type: 'event',
+  },
+] as const;
 
 // Role constants
 export const ROLES = {
@@ -396,36 +395,668 @@ export const ROLES = {
   DEFI_WITHDRAW_ROLE: 2,
   DEFI_EXECUTE_ROLE: 3,
   DEFI_TRANSFER_ROLE: 4,
-} as const
+} as const;
 
 export const ROLE_NAMES = {
   [ROLES.DEFI_DEPOSIT_ROLE]: 'Deposit',
   [ROLES.DEFI_WITHDRAW_ROLE]: 'Withdraw',
   [ROLES.DEFI_EXECUTE_ROLE]: 'Execute',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Transfer',
-} as const
+} as const;
 
 export const ROLE_DESCRIPTIONS = {
   [ROLES.DEFI_DEPOSIT_ROLE]: 'Can deposit to DeFi Vaults (configurable % per window)',
   [ROLES.DEFI_WITHDRAW_ROLE]: 'Can withdraw from DeFi Vaults (configurable % per window)',
-  [ROLES.DEFI_EXECUTE_ROLE]: 'Can execute generic protocol interactions (limited by portfolio loss %)',
+  [ROLES.DEFI_EXECUTE_ROLE]:
+    'Can execute generic protocol interactions (limited by portfolio loss %)',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Can transfer tokens from Safe (configurable % per window)',
-} as const
+} as const;
 
-// Safe contract ABI
 export const SAFE_ABI = [
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'AddedOwner',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'approvedHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'ApproveHash',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'handler',
+        type: 'address',
+      },
+    ],
+    name: 'ChangedFallbackHandler',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'guard',
+        type: 'address',
+      },
+    ],
+    name: 'ChangedGuard',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'threshold',
+        type: 'uint256',
+      },
+    ],
+    name: 'ChangedThreshold',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'module',
+        type: 'address',
+      },
+    ],
+    name: 'DisabledModule',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'module',
+        type: 'address',
+      },
+    ],
+    name: 'EnabledModule',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'txHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'payment',
+        type: 'uint256',
+      },
+    ],
+    name: 'ExecutionFailure',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'module',
+        type: 'address',
+      },
+    ],
+    name: 'ExecutionFromModuleFailure',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'module',
+        type: 'address',
+      },
+    ],
+    name: 'ExecutionFromModuleSuccess',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'txHash',
+        type: 'bytes32',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'payment',
+        type: 'uint256',
+      },
+    ],
+    name: 'ExecutionSuccess',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'owner',
+        type: 'address',
+      },
+    ],
+    name: 'RemovedOwner',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'module',
+        type: 'address',
+      },
+      { indexed: false, internalType: 'address', name: 'to', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+      { indexed: false, internalType: 'bytes', name: 'data', type: 'bytes' },
+      {
+        indexed: false,
+        internalType: 'enum Enum.Operation',
+        name: 'operation',
+        type: 'uint8',
+      },
+    ],
+    name: 'SafeModuleTransaction',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      { indexed: false, internalType: 'address', name: 'to', type: 'address' },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+      { indexed: false, internalType: 'bytes', name: 'data', type: 'bytes' },
+      {
+        indexed: false,
+        internalType: 'enum Enum.Operation',
+        name: 'operation',
+        type: 'uint8',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'safeTxGas',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'baseGas',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'gasPrice',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'gasToken',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address payable',
+        name: 'refundReceiver',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'signatures',
+        type: 'bytes',
+      },
+      {
+        indexed: false,
+        internalType: 'bytes',
+        name: 'additionalInfo',
+        type: 'bytes',
+      },
+    ],
+    name: 'SafeMultiSigTransaction',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'sender',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'value',
+        type: 'uint256',
+      },
+    ],
+    name: 'SafeReceived',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'address',
+        name: 'initiator',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address[]',
+        name: 'owners',
+        type: 'address[]',
+      },
+      {
+        indexed: false,
+        internalType: 'uint256',
+        name: 'threshold',
+        type: 'uint256',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'initializer',
+        type: 'address',
+      },
+      {
+        indexed: false,
+        internalType: 'address',
+        name: 'fallbackHandler',
+        type: 'address',
+      },
+    ],
+    name: 'SafeSetup',
+    type: 'event',
+  },
+  {
+    anonymous: false,
+    inputs: [
+      {
+        indexed: true,
+        internalType: 'bytes32',
+        name: 'msgHash',
+        type: 'bytes32',
+      },
+    ],
+    name: 'SignMsg',
+    type: 'event',
+  },
+  { stateMutability: 'nonpayable', type: 'fallback' },
+  {
+    inputs: [],
+    name: 'VERSION',
+    outputs: [{ internalType: 'string', name: '', type: 'string' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'uint256', name: '_threshold', type: 'uint256' },
+    ],
+    name: 'addOwnerWithThreshold',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'bytes32', name: 'hashToApprove', type: 'bytes32' }],
+    name: 'approveHash',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: '', type: 'address' },
+      { internalType: 'bytes32', name: '', type: 'bytes32' },
+    ],
+    name: 'approvedHashes',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'uint256', name: '_threshold', type: 'uint256' }],
+    name: 'changeThreshold',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: 'dataHash', type: 'bytes32' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'bytes', name: 'signatures', type: 'bytes' },
+      { internalType: 'uint256', name: 'requiredSignatures', type: 'uint256' },
+    ],
+    name: 'checkNSignatures',
+    outputs: [],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'bytes32', name: 'dataHash', type: 'bytes32' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'bytes', name: 'signatures', type: 'bytes' },
+    ],
+    name: 'checkSignatures',
+    outputs: [],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'prevModule', type: 'address' },
+      { internalType: 'address', name: 'module', type: 'address' },
+    ],
+    name: 'disableModule',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'domainSeparator',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'module', type: 'address' }],
+    name: 'enableModule',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'enum Enum.Operation', name: 'operation', type: 'uint8' },
+      { internalType: 'uint256', name: 'safeTxGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'baseGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'gasPrice', type: 'uint256' },
+      { internalType: 'address', name: 'gasToken', type: 'address' },
+      { internalType: 'address', name: 'refundReceiver', type: 'address' },
+      { internalType: 'uint256', name: '_nonce', type: 'uint256' },
+    ],
+    name: 'encodeTransactionData',
+    outputs: [{ internalType: 'bytes', name: '', type: 'bytes' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'enum Enum.Operation', name: 'operation', type: 'uint8' },
+      { internalType: 'uint256', name: 'safeTxGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'baseGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'gasPrice', type: 'uint256' },
+      { internalType: 'address', name: 'gasToken', type: 'address' },
+      {
+        internalType: 'address payable',
+        name: 'refundReceiver',
+        type: 'address',
+      },
+      { internalType: 'bytes', name: 'signatures', type: 'bytes' },
+    ],
+    name: 'execTransaction',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'payable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'enum Enum.Operation', name: 'operation', type: 'uint8' },
+    ],
+    name: 'execTransactionFromModule',
+    outputs: [{ internalType: 'bool', name: 'success', type: 'bool' }],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'enum Enum.Operation', name: 'operation', type: 'uint8' },
+    ],
+    name: 'execTransactionFromModuleReturnData',
+    outputs: [
+      { internalType: 'bool', name: 'success', type: 'bool' },
+      { internalType: 'bytes', name: 'returnData', type: 'bytes' },
+    ],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'getChainId',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'start', type: 'address' },
+      { internalType: 'uint256', name: 'pageSize', type: 'uint256' },
+    ],
+    name: 'getModulesPaginated',
+    outputs: [
+      { internalType: 'address[]', name: 'array', type: 'address[]' },
+      { internalType: 'address', name: 'next', type: 'address' },
+    ],
+    stateMutability: 'view',
+    type: 'function',
+  },
   {
     inputs: [],
     name: 'getOwners',
-    outputs: [{ name: '', type: 'address[]' }],
+    outputs: [{ internalType: 'address[]', name: '', type: 'address[]' }],
     stateMutability: 'view',
-    type: 'function'
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'uint256', name: 'offset', type: 'uint256' },
+      { internalType: 'uint256', name: 'length', type: 'uint256' },
+    ],
+    name: 'getStorageAt',
+    outputs: [{ internalType: 'bytes', name: '', type: 'bytes' }],
+    stateMutability: 'view',
+    type: 'function',
   },
   {
     inputs: [],
     name: 'getThreshold',
-    outputs: [{ name: '', type: 'uint256' }],
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
     stateMutability: 'view',
-    type: 'function'
-  }
-] as const
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'uint256', name: 'value', type: 'uint256' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'enum Enum.Operation', name: 'operation', type: 'uint8' },
+      { internalType: 'uint256', name: 'safeTxGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'baseGas', type: 'uint256' },
+      { internalType: 'uint256', name: 'gasPrice', type: 'uint256' },
+      { internalType: 'address', name: 'gasToken', type: 'address' },
+      { internalType: 'address', name: 'refundReceiver', type: 'address' },
+      { internalType: 'uint256', name: '_nonce', type: 'uint256' },
+    ],
+    name: 'getTransactionHash',
+    outputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'module', type: 'address' }],
+    name: 'isModuleEnabled',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'owner', type: 'address' }],
+    name: 'isOwner',
+    outputs: [{ internalType: 'bool', name: '', type: 'bool' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [],
+    name: 'nonce',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'prevOwner', type: 'address' },
+      { internalType: 'address', name: 'owner', type: 'address' },
+      { internalType: 'uint256', name: '_threshold', type: 'uint256' },
+    ],
+    name: 'removeOwner',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'handler', type: 'address' }],
+    name: 'setFallbackHandler',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'address', name: 'guard', type: 'address' }],
+    name: 'setGuard',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address[]', name: '_owners', type: 'address[]' },
+      { internalType: 'uint256', name: '_threshold', type: 'uint256' },
+      { internalType: 'address', name: 'to', type: 'address' },
+      { internalType: 'bytes', name: 'data', type: 'bytes' },
+      { internalType: 'address', name: 'fallbackHandler', type: 'address' },
+      { internalType: 'address', name: 'paymentToken', type: 'address' },
+      { internalType: 'uint256', name: 'payment', type: 'uint256' },
+      {
+        internalType: 'address payable',
+        name: 'paymentReceiver',
+        type: 'address',
+      },
+    ],
+    name: 'setup',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [{ internalType: 'bytes32', name: '', type: 'bytes32' }],
+    name: 'signedMessages',
+    outputs: [{ internalType: 'uint256', name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'targetContract', type: 'address' },
+      { internalType: 'bytes', name: 'calldataPayload', type: 'bytes' },
+    ],
+    name: 'simulateAndRevert',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  {
+    inputs: [
+      { internalType: 'address', name: 'prevOwner', type: 'address' },
+      { internalType: 'address', name: 'oldOwner', type: 'address' },
+      { internalType: 'address', name: 'newOwner', type: 'address' },
+    ],
+    name: 'swapOwner',
+    outputs: [],
+    stateMutability: 'nonpayable',
+    type: 'function',
+  },
+  { stateMutability: 'payable', type: 'receive' },
+] as const;
