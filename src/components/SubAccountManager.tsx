@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -10,6 +9,7 @@ import { ProtocolPermissions } from '@/components/ProtocolPermissions'
 import { SpendingLimits } from '@/components/SpendingLimits'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { useIsSafeOwner, useHasRole } from '@/hooks/useSafe'
+import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
 import { isAddress } from 'viem'
 
 export function SubAccountManager() {
@@ -19,17 +19,10 @@ export function SubAccountManager() {
   const [grantDeposit, setGrantDeposit] = useState(false)
   const [grantWithdraw, setGrantWithdraw] = useState(false)
   const [managedAccounts, setManagedAccounts] = useState<Set<`0x${string}`>>(new Set())
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  // Write contracts
-  const { writeContract: grantRole, data: grantHash, isPending: isGrantPending } = useWriteContract()
-  const { isLoading: isGrantConfirming, isSuccess: isGrantSuccess } = useWaitForTransactionReceipt({
-    hash: grantHash,
-  })
-
-  const { writeContract: revokeRole, data: revokeHash, isPending: isRevokePending } = useWriteContract()
-  const { isLoading: isRevokeConfirming } = useWaitForTransactionReceipt({
-    hash: revokeHash,
-  })
+  // Use Safe proposal hook
+  const { proposeTransaction, isPending, error } = useSafeProposal()
 
   const handleAddSubAccount = async () => {
     if (!isAddress(newSubAccount)) {
@@ -42,24 +35,29 @@ export function SubAccountManager() {
       return
     }
 
-    try {
-      // Grant deposit role if selected
-      if (grantDeposit && addresses.defiInteractor) {
-        grantRole({
-          address: addresses.defiInteractor,
-          abi: DEFI_INTERACTOR_ABI,
-          functionName: 'grantRole',
-          args: [newSubAccount as `0x${string}`, ROLES.DEFI_DEPOSIT_ROLE],
-        })
-      }
+    if (!addresses.defiInteractor) {
+      alert('DeFi Interactor address not configured')
+      return
+    }
 
-      // Grant withdraw role if selected
-      if (grantWithdraw && addresses.defiInteractor) {
-        grantRole({
-          address: addresses.defiInteractor,
-          abi: DEFI_INTERACTOR_ABI,
-          functionName: 'grantRole',
-          args: [newSubAccount as `0x${string}`, ROLES.DEFI_WITHDRAW_ROLE],
+    try {
+      setSuccessMessage(null)
+
+      const rolesToGrant: number[] = []
+      if (grantDeposit) rolesToGrant.push(ROLES.DEFI_DEPOSIT_ROLE)
+      if (grantWithdraw) rolesToGrant.push(ROLES.DEFI_WITHDRAW_ROLE)
+
+      // Propose each role grant as a separate transaction to the Safe
+      for (const roleId of rolesToGrant) {
+        const data = encodeContractCall(
+          DEFI_INTERACTOR_ABI,
+          'grantRole',
+          [newSubAccount as `0x${string}`, roleId]
+        )
+
+        await proposeTransaction({
+          to: addresses.defiInteractor,
+          data,
         })
       }
 
@@ -70,25 +68,35 @@ export function SubAccountManager() {
       setNewSubAccount('')
       setGrantDeposit(false)
       setGrantWithdraw(false)
+
+      setSuccessMessage('Transaction proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
-      console.error('Error granting role:', error)
-      alert('Failed to grant role. Make sure you are a Safe owner.')
+      console.error('Error proposing role grant:', error)
+      alert('Failed to propose transaction. Make sure you are a Safe signer.')
     }
   }
 
-  const handleRevokeRole = (account: `0x${string}`, roleId: number) => {
+  const handleRevokeRole = async (account: `0x${string}`, roleId: number) => {
     if (!addresses.defiInteractor) return
 
     try {
-      revokeRole({
-        address: addresses.defiInteractor,
-        abi: DEFI_INTERACTOR_ABI,
-        functionName: 'revokeRole',
-        args: [account, roleId],
+      setSuccessMessage(null)
+
+      const data = encodeContractCall(
+        DEFI_INTERACTOR_ABI,
+        'revokeRole',
+        [account, roleId]
+      )
+
+      await proposeTransaction({
+        to: addresses.defiInteractor,
+        data,
       })
+
+      setSuccessMessage('Revoke transaction proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
-      console.error('Error revoking role:', error)
-      alert('Failed to revoke role. Make sure you are a Safe owner.')
+      console.error('Error proposing role revoke:', error)
+      alert('Failed to propose transaction. Make sure you are a Safe signer.')
     }
   }
 
@@ -161,15 +169,21 @@ export function SubAccountManager() {
 
             <Button
               onClick={handleAddSubAccount}
-              disabled={isGrantPending || isGrantConfirming || !newSubAccount}
+              disabled={isPending || !newSubAccount}
               className="w-full"
             >
-              {isGrantPending || isGrantConfirming ? 'Adding Sub-Account...' : 'Add Sub-Account'}
+              {isPending ? 'Proposing to Safe...' : 'Propose Sub-Account'}
             </Button>
 
-            {isGrantSuccess && (
+            {successMessage && (
               <p className="text-sm text-green-600">
-                ✓ Sub-account added successfully!
+                ✓ {successMessage}
+              </p>
+            )}
+
+            {error && (
+              <p className="text-sm text-red-600">
+                ✗ {error}
               </p>
             )}
           </div>
@@ -196,7 +210,7 @@ export function SubAccountManager() {
                   key={account}
                   account={account}
                   onRevokeRole={handleRevokeRole}
-                  isRevoking={isRevokePending || isRevokeConfirming}
+                  isRevoking={isPending}
                 />
               ))}
             </div>
@@ -209,7 +223,7 @@ export function SubAccountManager() {
 
 interface SubAccountRowProps {
   account: `0x${string}`
-  onRevokeRole: (account: `0x${string}`, roleId: number) => void
+  onRevokeRole: (account: `0x${string}`, roleId: number) => Promise<void>
   isRevoking: boolean
 }
 

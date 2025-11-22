@@ -20,7 +20,7 @@ function App() {
           <div className="flex justify-between items-center">
             <div>
               <h1 className="text-4xl font-bold tracking-tight">
-                Morpho Smart Wallet
+                DeFi Smart Wallet
               </h1>
               <p className="text-muted-foreground mt-1">
                 {isSafeOwner

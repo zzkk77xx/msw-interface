@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { useSubAccountLimits } from '@/hooks/useSafe'
+import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
 
 interface SpendingLimitsProps {
   subAccountAddress: `0x${string}`
@@ -22,11 +22,9 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
   const [withdrawLimit, setWithdrawLimit] = useState('10') // Default 10%
   const [lossLimit, setLossLimit] = useState('5') // Default 5%
   const [windowHours, setWindowHours] = useState('24') // Default 24 hours
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const { writeContract, data: txHash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash,
-  })
+  const { proposeTransaction, isPending, error } = useSafeProposal()
 
   const handleSaveLimits = async () => {
     const depositBps = Math.floor(parseFloat(depositLimit) * 100)
@@ -60,21 +58,29 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
     }
 
     try {
-      writeContract({
-        address: addresses.defiInteractor,
-        abi: DEFI_INTERACTOR_ABI,
-        functionName: 'setSubAccountLimits',
-        args: [
+      setSuccessMessage(null)
+
+      const data = encodeContractCall(
+        DEFI_INTERACTOR_ABI,
+        'setSubAccountLimits',
+        [
           subAccountAddress,
           BigInt(depositBps),
           BigInt(withdrawBps),
           BigInt(lossBps),
           BigInt(windowSeconds),
-        ],
+        ]
+      )
+
+      await proposeTransaction({
+        to: addresses.defiInteractor,
+        data,
       })
+
+      setSuccessMessage('Spending limits proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
-      console.error('Error setting limits:', error)
-      alert('Failed to set spending limits')
+      console.error('Error proposing limits:', error)
+      alert('Failed to propose transaction. Make sure you are a Safe signer.')
     }
   }
 
@@ -229,15 +235,21 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
 
             <Button
               onClick={handleSaveLimits}
-              disabled={isPending || isConfirming}
+              disabled={isPending}
               className="w-full"
             >
-              {isPending || isConfirming ? 'Saving Limits...' : 'Save Spending Limits'}
+              {isPending ? 'Proposing to Safe...' : 'Propose Spending Limits'}
             </Button>
 
-            {isSuccess && (
+            {successMessage && (
               <p className="text-sm text-green-600 mt-2 text-center">
-                Spending limits updated successfully
+                ✓ {successMessage}
+              </p>
+            )}
+
+            {error && (
+              <p className="text-sm text-red-600 mt-2 text-center">
+                ✗ {error}
               </p>
             )}
           </div>

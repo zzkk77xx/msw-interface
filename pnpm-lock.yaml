@@ -8,6 +8,12 @@ dependencies:
   '@rainbow-me/rainbowkit':
     specifier: ^2.2.9
     version: 2.2.9(@tanstack/react-query@5.90.10)(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)(typescript@5.9.3)(viem@2.39.3)(wagmi@2.19.5)
+  '@safe-global/api-kit':
+    specifier: ^4.0.1
+    version: 4.0.1(typescript@5.9.3)
+  '@safe-global/protocol-kit':
+    specifier: ^6.1.2
+    version: 6.1.2(typescript@5.9.3)
   '@tanstack/react-query':
     specifier: ^5.90.10
     version: 5.90.10(react@18.3.1)
@@ -1060,6 +1066,16 @@ packages:
     deprecated: 'The package is now available as "qr": npm install qr'
     dev: false
 
+  /@peculiar/asn1-schema@2.6.0:
+    resolution: {integrity: sha512-xNLYLBFTBKkCzEZIw842BxytQQATQv+lDTCEMZ8C196iJcJJMBUZxrhSTxLaohMyKK8QlzRNTRkUmanucnDSqg==}
+    requiresBuild: true
+    dependencies:
+      asn1js: 3.0.6
+      pvtsutils: 1.3.6
+      tslib: 2.8.1
+    dev: false
+    optional: true
+
   /@rainbow-me/rainbowkit@2.2.9(@tanstack/react-query@5.90.10)(@types/react@18.3.27)(react-dom@18.3.1)(react@18.3.1)(typescript@5.9.3)(viem@2.39.3)(wagmi@2.19.5):
     resolution: {integrity: sha512-zXAeqkqpznpj9yEs1bTbpZbq0pVYKdJUnqqK/nI8xyYFDWchIOyBoEb/4+goT5RaHfGbDe9dp6pIEu/KelKE6A==}
     engines: {node: '>=12.4'}
@@ -1551,6 +1567,40 @@ packages:
     dev: true
     optional: true
 
+  /@safe-global/api-kit@4.0.1(typescript@5.9.3):
+    resolution: {integrity: sha512-pNtDLgMHlCSr4Hwwe6jsnvMheAu2SZCTqjYlnNe4cKH2pSKINVRTiILoeJ0wOpixrMCH4NlgJ+9N3QruRNcCpQ==}
+    dependencies:
+      '@safe-global/protocol-kit': 6.1.2(typescript@5.9.3)
+      '@safe-global/types-kit': 3.0.0(typescript@5.9.3)
+      node-fetch: 2.7.0
+      viem: 2.39.3(typescript@5.9.3)
+    transitivePeerDependencies:
+      - bufferutil
+      - encoding
+      - typescript
+      - utf-8-validate
+      - zod
+    dev: false
+
+  /@safe-global/protocol-kit@6.1.2(typescript@5.9.3):
+    resolution: {integrity: sha512-cTpPdUAS2AMfGCkD1T601rQNjT0rtMQLA2TH7L/C+iFPAC6WrrDFop2B9lzeHjczlnVzrRpfFe4cL1bLrJ9NZw==}
+    dependencies:
+      '@safe-global/safe-deployments': 1.37.49
+      '@safe-global/safe-modules-deployments': 2.2.21
+      '@safe-global/types-kit': 3.0.0(typescript@5.9.3)
+      abitype: 1.1.0(typescript@5.9.3)(zod@4.1.12)
+      semver: 7.7.3
+      viem: 2.39.3(typescript@5.9.3)
+    optionalDependencies:
+      '@noble/curves': 1.9.7
+      '@peculiar/asn1-schema': 2.6.0
+    transitivePeerDependencies:
+      - bufferutil
+      - typescript
+      - utf-8-validate
+      - zod
+    dev: false
+
   /@safe-global/safe-apps-provider@0.18.6(typescript@5.9.3):
     resolution: {integrity: sha512-4LhMmjPWlIO8TTDC2AwLk44XKXaK6hfBTWyljDm0HQ6TWlOEijVWNrt2s3OCVMSxlXAcEzYfqyu1daHZooTC2Q==}
     dependencies:
@@ -1575,9 +1625,28 @@ packages:
       - zod
     dev: false
 
+  /@safe-global/safe-deployments@1.37.49:
+    resolution: {integrity: sha512-132QgqMY1/HktXqmda/uPp5b+73UXTgKRB00Xgc1kduFqceSw/ZyF1Q9jJjbND9q91hhapnXhYKWN2/HiWkRcg==}
+    dependencies:
+      semver: 7.7.3
+    dev: false
+
   /@safe-global/safe-gateway-typescript-sdk@3.23.1:
     resolution: {integrity: sha512-6ORQfwtEJYpalCeVO21L4XXGSdbEMfyp2hEv6cP82afKXSwvse6d3sdelgaPWUxHIsFRkWvHDdzh8IyyKHZKxw==}
     engines: {node: '>=16'}
+    dev: false
+
+  /@safe-global/safe-modules-deployments@2.2.21:
+    resolution: {integrity: sha512-fveOlRv0ccwsuaZjP1u7ZbXrwCyqMTYYiqETOGo8NdzTaceRUyR9TNzagSWovOSuHPVyUGJ9lnsxizikt/+PiQ==}
+    dev: false
+
+  /@safe-global/types-kit@3.0.0(typescript@5.9.3):
+    resolution: {integrity: sha512-AZWIlR5MguDPdGiOj7BB4JQPY2afqmWQww1mu8m8Oi16HHBW99G01kFOu4NEHBwEU1cgwWOMY19hsI5KyL4W2w==}
+    dependencies:
+      abitype: 1.1.0(typescript@5.9.3)(zod@4.1.12)
+    transitivePeerDependencies:
+      - typescript
+      - zod
     dev: false
 
   /@scure/base@1.1.9:
@@ -3399,6 +3468,17 @@ packages:
     resolution: {integrity: sha512-HGyxoOTYUyCM6stUe6EJgnd4EoewAI7zMdfqO+kGjnlZmBDz/cR5pf8r/cR4Wq60sL/p0IkcjUEEPwS3GFrIyw==}
     engines: {node: '>=8'}
     dev: true
+
+  /asn1js@3.0.6:
+    resolution: {integrity: sha512-UOCGPYbl0tv8+006qks/dTgV9ajs97X2p0FAbyS2iyCRrmLSRolDaHdp+v/CLgnzHc3fVB+CwYiUmei7ndFcgA==}
+    engines: {node: '>=12.0.0'}
+    requiresBuild: true
+    dependencies:
+      pvtsutils: 1.3.6
+      pvutils: 1.1.5
+      tslib: 2.8.1
+    dev: false
+    optional: true
 
   /async-mutex@0.2.6:
     resolution: {integrity: sha512-Hs4R+4SPgamu6rSGW8C7cV9gaWUKEHykfzCCvIRuaVv636Ju10ZdeUbvb4TBEW0INuq2DHZqXbK4Nd3yG4RaRw==}
@@ -5558,6 +5638,21 @@ packages:
     resolution: {integrity: sha512-vYt7UD1U9Wg6138shLtLOvdAu+8DsC/ilFtEVHcH+wydcSpNE20AfSOduf6MkRFahL5FY7X1oU7nKVZFtfq8Fg==}
     engines: {node: '>=6'}
     dev: true
+
+  /pvtsutils@1.3.6:
+    resolution: {integrity: sha512-PLgQXQ6H2FWCaeRak8vvk1GW462lMxB5s3Jm673N82zI4vqtVUPuZdffdZbPDFRoU8kAhItWFtPCWiPpp4/EDg==}
+    requiresBuild: true
+    dependencies:
+      tslib: 2.8.1
+    dev: false
+    optional: true
+
+  /pvutils@1.1.5:
+    resolution: {integrity: sha512-KTqnxsgGiQ6ZAzZCVlJH5eOjSnvlyEgx1m8bkRJfOhmGRqfo5KLvmAlACQkrjEtOQ4B7wF9TdSLIs9O90MX9xA==}
+    engines: {node: '>=16.0.0'}
+    requiresBuild: true
+    dev: false
+    optional: true
 
   /qr@0.5.2:
     resolution: {integrity: sha512-91M3sVlA7xCFpkJtYX5xzVH8tDo4rNZ7jr8v+1CRgPVkZ4D+Vl9y8rtZWJ/YkEUM6U/h0FAu5W/JAK7iowOteA==}

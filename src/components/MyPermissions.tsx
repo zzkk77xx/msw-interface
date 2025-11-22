@@ -13,8 +13,8 @@ export function MyPermissions() {
   const [showProtocols, setShowProtocols] = useState(false)
 
   // Check which roles the connected address has
-  const { data: hasDepositRole } = useHasRole(address, ROLES.DEFI_DEPOSIT_ROLE)
-  const { data: hasWithdrawRole } = useHasRole(address, ROLES.DEFI_WITHDRAW_ROLE)
+  const { data: hasDepositRole } = useHasRole(address as `0x${string}` | undefined, ROLES.DEFI_DEPOSIT_ROLE)
+  const { data: hasWithdrawRole } = useHasRole(address as `0x${string}` | undefined, ROLES.DEFI_WITHDRAW_ROLE)
 
   if (!isConnected) {
     return (
@@ -102,7 +102,7 @@ export function MyPermissions() {
                         <ProtocolAccess
                           key={protocol.id}
                           protocol={protocol}
-                          subAccount={address}
+                          subAccount={address as `0x${string}`}
                         />
                       ))}
                     </div>

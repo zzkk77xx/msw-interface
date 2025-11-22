@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -7,6 +6,7 @@ import { Badge } from '@/components/ui/badge'
 import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
 import { PROTOCOLS, Protocol, ProtocolPool } from '@/lib/protocols'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
+import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
 
 interface ProtocolPermissionsProps {
   subAccountAddress: `0x${string}`
@@ -16,11 +16,9 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
   const { addresses } = useContractAddresses()
   const [selectedProtocols, setSelectedProtocols] = useState<Map<string, Set<string>>>(new Map())
   const [expandedProtocol, setExpandedProtocol] = useState<string | null>(null)
+  const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
-  const { writeContract, data: txHash, isPending } = useWriteContract()
-  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({
-    hash: txHash,
-  })
+  const { proposeTransaction, isPending, error } = useSafeProposal()
 
   const toggleProtocol = (protocolId: string) => {
     const current = selectedProtocols.get(protocolId)
@@ -92,15 +90,23 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
     }
 
     try {
-      writeContract({
-        address: addresses.defiInteractor,
-        abi: DEFI_INTERACTOR_ABI,
-        functionName: 'setAllowedAddresses',
-        args: [subAccountAddress, allowedAddresses, true],
+      setSuccessMessage(null)
+
+      const data = encodeContractCall(
+        DEFI_INTERACTOR_ABI,
+        'setAllowedAddresses',
+        [subAccountAddress, allowedAddresses, true]
+      )
+
+      await proposeTransaction({
+        to: addresses.defiInteractor,
+        data,
       })
+
+      setSuccessMessage('Protocol permissions proposed to Safe multisig. Other signers need to approve it.')
     } catch (error) {
-      console.error('Error setting allowed addresses:', error)
-      alert('Failed to set protocol permissions')
+      console.error('Error proposing permissions:', error)
+      alert('Failed to propose transaction. Make sure you are a Safe signer.')
     }
   }
 
@@ -182,15 +188,21 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
           <div className="pt-4 border-t">
             <Button
               onClick={handleSavePermissions}
-              disabled={isPending || isConfirming || selectedProtocols.size === 0}
+              disabled={isPending || selectedProtocols.size === 0}
               className="w-full"
             >
-              {isPending || isConfirming ? 'Saving Permissions...' : 'Save Protocol Permissions'}
+              {isPending ? 'Proposing to Safe...' : 'Propose Protocol Permissions'}
             </Button>
 
-            {isSuccess && (
+            {successMessage && (
               <p className="text-sm text-green-600 mt-2 text-center">
-                Protocol permissions updated successfully
+                ✓ {successMessage}
+              </p>
+            )}
+
+            {error && (
+              <p className="text-sm text-red-600 mt-2 text-center">
+                ✗ {error}
               </p>
             )}
           </div>

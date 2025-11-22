@@ -406,8 +406,8 @@ export const ROLE_NAMES = {
 } as const
 
 export const ROLE_DESCRIPTIONS = {
-  [ROLES.DEFI_DEPOSIT_ROLE]: 'Can deposit to Morpho Vaults (configurable % per window)',
-  [ROLES.DEFI_WITHDRAW_ROLE]: 'Can withdraw from Morpho Vaults (configurable % per window)',
+  [ROLES.DEFI_DEPOSIT_ROLE]: 'Can deposit to DeFi Vaults (configurable % per window)',
+  [ROLES.DEFI_WITHDRAW_ROLE]: 'Can withdraw from DeFi Vaults (configurable % per window)',
   [ROLES.DEFI_EXECUTE_ROLE]: 'Can execute generic protocol interactions (limited by portfolio loss %)',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Can transfer tokens from Safe (configurable % per window)',
 } as const
