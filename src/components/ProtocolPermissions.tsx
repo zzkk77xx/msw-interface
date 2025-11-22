@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Checkbox } from '@/components/ui/checkbox'
@@ -7,6 +7,7 @@ import { DEFI_INTERACTOR_ABI } from '@/lib/contracts'
 import { PROTOCOLS, Protocol, ProtocolPool } from '@/lib/protocols'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
+import { useAllowedAddresses } from '@/hooks/useSafe'
 
 interface ProtocolPermissionsProps {
   subAccountAddress: `0x${string}`
@@ -19,6 +20,51 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   const { proposeTransaction, isPending, error } = useSafeProposal()
+
+  // Build list of all addresses to check
+  const addressesToCheck = useMemo(() => {
+    const allAddresses: `0x${string}`[] = []
+    PROTOCOLS.forEach(protocol => {
+      allAddresses.push(protocol.contractAddress)
+      protocol.pools.forEach(pool => {
+        allAddresses.push(pool.address)
+      })
+    })
+    return allAddresses
+  }, [])
+
+  // Fetch already allowed addresses from contract
+  const { allowedAddresses, isLoading: isLoadingAllowed } = useAllowedAddresses(
+    subAccountAddress,
+    addressesToCheck
+  )
+
+  // Initialize selected protocols from allowed addresses
+  useEffect(() => {
+    if (allowedAddresses.size === 0) return
+
+    const newMap = new Map<string, Set<string>>()
+
+    PROTOCOLS.forEach(protocol => {
+      const selectedPools = new Set<string>()
+
+      // Check if protocol contract is allowed
+      const isProtocolAllowed = allowedAddresses.has(protocol.contractAddress)
+
+      // Check which pools are allowed
+      protocol.pools.forEach(pool => {
+        if (allowedAddresses.has(pool.address)) {
+          selectedPools.add(pool.id)
+        }
+      })
+
+      if (isProtocolAllowed || selectedPools.size > 0) {
+        newMap.set(protocol.id, selectedPools)
+      }
+    })
+
+    setSelectedProtocols(newMap)
+  }, [allowedAddresses])
 
   const toggleProtocol = (protocolId: string) => {
     const current = selectedProtocols.get(protocolId)
@@ -94,7 +140,7 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
 
       const data = encodeContractCall(
         addresses.defiInteractor,
-        DEFI_INTERACTOR_ABI,
+        DEFI_INTERACTOR_ABI as unknown as any[],
         'setAllowedAddresses',
         [subAccountAddress, allowedAddresses, true]
       )
@@ -127,95 +173,126 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
         </CardDescription>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          {PROTOCOLS.map(protocol => {
-            const selectedPools = selectedProtocols.get(protocol.id)
-            const hasSelectedPools = selectedPools && selectedPools.size > 0
-            const isExpanded = expandedProtocol === protocol.id
+        {isLoadingAllowed ? (
+          <p className="text-sm text-muted-foreground">Loading current permissions...</p>
+        ) : (
+          <div className="space-y-4">
+            {allowedAddresses.size > 0 && (
+              <div className="p-3 bg-blue-50 border border-blue-200 rounded-lg mb-4">
+                <p className="text-sm font-medium text-blue-900">Currently Allowed</p>
+                <p className="text-xs text-blue-700 mt-1">
+                  {allowedAddresses.size} address{allowedAddresses.size !== 1 ? 'es' : ''} already
+                  permitted
+                </p>
+              </div>
+            )}
 
-            return (
-              <div
-                key={protocol.id}
-                className="border rounded-lg p-4"
-              >
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-3 flex-1">
-                    <Checkbox
-                      id={`protocol-${protocol.id}`}
-                      checked={hasSelectedPools}
-                      onChange={() => toggleProtocol(protocol.id)}
-                      label=""
-                    />
-                    <div
-                      className="flex-1 cursor-pointer"
-                      onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}
-                    >
-                      <div className="flex items-center gap-2">
-                        <p className="font-medium">{protocol.name}</p>
-                        {hasSelectedPools && (
-                          <Badge
-                            variant="secondary"
-                            className="text-xs"
-                          >
-                            {selectedPools.size} pool{selectedPools.size !== 1 ? 's' : ''}
-                          </Badge>
-                        )}
+            {PROTOCOLS.map(protocol => {
+              const selectedPools = selectedProtocols.get(protocol.id)
+              const hasSelectedPools = selectedPools && selectedPools.size > 0
+              const isExpanded = expandedProtocol === protocol.id
+
+              // Check if protocol is currently allowed
+              const isProtocolAllowed = allowedAddresses.has(protocol.contractAddress)
+
+              return (
+                <div
+                  key={protocol.id}
+                  className={`border rounded-lg p-4 ${isProtocolAllowed ? 'bg-green-50 border-green-200' : ''}`}
+                >
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-3 flex-1">
+                      <Checkbox
+                        id={`protocol-${protocol.id}`}
+                        checked={hasSelectedPools}
+                        onChange={() => toggleProtocol(protocol.id)}
+                        label=""
+                      />
+                      <div
+                        className="flex-1 cursor-pointer"
+                        onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}
+                      >
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium">{protocol.name}</p>
+                          {isProtocolAllowed && (
+                            <Badge
+                              variant="default"
+                              className="text-xs bg-green-600"
+                            >
+                              Allowed
+                            </Badge>
+                          )}
+                          {hasSelectedPools && (
+                            <Badge
+                              variant="secondary"
+                              className="text-xs"
+                            >
+                              {selectedPools.size} pool{selectedPools.size !== 1 ? 's' : ''}
+                            </Badge>
+                          )}
+                        </div>
+                        <p className="text-xs text-muted-foreground mt-0.5">
+                          {protocol.description}
+                        </p>
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">{protocol.description}</p>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2">
-                    {isExpanded && (
+                    <div className="flex items-center gap-2">
+                      {isExpanded && (
+                        <Button
+                          size="sm"
+                          variant="ghost"
+                          onClick={() => selectAllPools(protocol)}
+                        >
+                          Select All
+                        </Button>
+                      )}
                       <Button
                         size="sm"
                         variant="ghost"
-                        onClick={() => selectAllPools(protocol)}
+                        onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}
                       >
-                        Select All
+                        {isExpanded ? '▲' : '▼'}
                       </Button>
-                    )}
-                    <Button
-                      size="sm"
-                      variant="ghost"
-                      onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}
-                    >
-                      {isExpanded ? '▲' : '▼'}
-                    </Button>
+                    </div>
                   </div>
+
+                  {isExpanded && (
+                    <div className="ml-8 mt-3 space-y-2 border-l-2 border-muted pl-4">
+                      {protocol.pools.map(pool => {
+                        const isPoolAllowed = allowedAddresses.has(pool.address)
+                        return (
+                          <PoolCheckbox
+                            key={pool.id}
+                            pool={pool}
+                            checked={selectedPools?.has(pool.id) || false}
+                            onToggle={() => togglePool(protocol.id, pool.id)}
+                            isAllowed={isPoolAllowed}
+                          />
+                        )
+                      })}
+                    </div>
+                  )}
                 </div>
+              )
+            })}
 
-                {isExpanded && (
-                  <div className="ml-8 mt-3 space-y-2 border-l-2 border-muted pl-4">
-                    {protocol.pools.map(pool => (
-                      <PoolCheckbox
-                        key={pool.id}
-                        pool={pool}
-                        checked={selectedPools?.has(pool.id) || false}
-                        onToggle={() => togglePool(protocol.id, pool.id)}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+            <div className="pt-4 border-t">
+              <Button
+                onClick={handleSavePermissions}
+                disabled={isPending || selectedProtocols.size === 0}
+                className="w-full"
+              >
+                {isPending ? 'Proposing to Safe...' : 'Propose Protocol Permissions'}
+              </Button>
 
-          <div className="pt-4 border-t">
-            <Button
-              onClick={handleSavePermissions}
-              disabled={isPending || selectedProtocols.size === 0}
-              className="w-full"
-            >
-              {isPending ? 'Proposing to Safe...' : 'Propose Protocol Permissions'}
-            </Button>
+              {successMessage && (
+                <p className="text-sm text-green-600 mt-2 text-center">✓ {successMessage}</p>
+              )}
 
-            {successMessage && (
-              <p className="text-sm text-green-600 mt-2 text-center">✓ {successMessage}</p>
-            )}
-
-            {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {error}</p>}
+              {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {String(error)}</p>}
+            </div>
           </div>
-        </div>
+        )}
       </CardContent>
     </Card>
   )
@@ -225,11 +302,12 @@ interface PoolCheckboxProps {
   pool: ProtocolPool
   checked: boolean
   onToggle: () => void
+  isAllowed: boolean
 }
 
-function PoolCheckbox({ pool, checked, onToggle }: PoolCheckboxProps) {
+function PoolCheckbox({ pool, checked, onToggle, isAllowed }: PoolCheckboxProps) {
   return (
-    <div className="flex items-start gap-2">
+    <div className={`flex items-start gap-2 p-2 rounded ${isAllowed ? 'bg-green-100' : ''}`}>
       <Checkbox
         id={`pool-${pool.id}`}
         checked={checked}
@@ -242,6 +320,14 @@ function PoolCheckbox({ pool, checked, onToggle }: PoolCheckboxProps) {
       >
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium">{pool.name}</p>
+          {isAllowed && (
+            <Badge
+              variant="default"
+              className="text-xs bg-green-600"
+            >
+              Allowed
+            </Badge>
+          )}
           <Badge
             variant="outline"
             className="text-xs"

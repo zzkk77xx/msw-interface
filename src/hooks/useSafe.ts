@@ -58,19 +58,6 @@ export function useIsSafeOwner() {
 }
 
 /**
- * Hook to read the portfolio value from the DeFi Interactor contract
- */
-export function usePortfolioValue() {
-  const { addresses } = useContractAddresses()
-
-  return useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getPortfolioValue',
-  })
-}
-
-/**
  * Hook to read sub-account limits for a given address
  */
 export function useSubAccountLimits(subAccountAddress?: `0x${string}`) {
@@ -95,48 +82,6 @@ export function useHasRole(member?: `0x${string}`, roleId?: number) {
     abi: DEFI_INTERACTOR_ABI,
     functionName: 'hasRole',
     args: member && roleId !== undefined ? [member, roleId] : undefined,
-  })
-}
-
-/**
- * Hook to read deposit window data for a sub-account
- */
-export function useDepositWindow(subAccountAddress?: `0x${string}`) {
-  const { addresses } = useContractAddresses()
-
-  return useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getDepositWindow',
-    args: subAccountAddress ? [subAccountAddress] : undefined,
-  })
-}
-
-/**
- * Hook to read withdraw window data for a sub-account
- */
-export function useWithdrawWindow(subAccountAddress?: `0x${string}`) {
-  const { addresses } = useContractAddresses()
-
-  return useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getWithdrawWindow',
-    args: subAccountAddress ? [subAccountAddress] : undefined,
-  })
-}
-
-/**
- * Hook to read transfer window data for a sub-account
- */
-export function useTransferWindow(subAccountAddress?: `0x${string}`) {
-  const { addresses } = useContractAddresses()
-
-  return useReadContract({
-    address: addresses.defiInteractor,
-    abi: DEFI_INTERACTOR_ABI,
-    functionName: 'getTransferWindow',
-    args: subAccountAddress ? [subAccountAddress] : undefined,
   })
 }
 
@@ -241,4 +186,69 @@ export function useManagedAccounts() {
   }, [addresses.defiInteractor, publicClient])
 
   return { accounts, isLoading, error, refetch: () => setIsLoading(true) }
+}
+
+/**
+ * Hook to check multiple addresses against the allowedAddresses mapping
+ * Takes a list of addresses to check and returns which ones are allowed
+ */
+export function useAllowedAddresses(
+  subAccountAddress?: `0x${string}`,
+  addressesToCheck?: `0x${string}`[]
+) {
+  const { addresses } = useContractAddresses()
+  const publicClient = usePublicClient()
+  const [allowedAddresses, setAllowedAddresses] = useState<Set<`0x${string}`>>(new Set())
+  const [isLoading, setIsLoading] = useState(true)
+  const [error, setError] = useState<Error | null>(null)
+
+  useEffect(() => {
+    async function checkAllowedAddresses() {
+      if (!addresses.defiInteractor || !publicClient || !subAccountAddress || !addressesToCheck) {
+        setIsLoading(false)
+        return
+      }
+
+      try {
+        setIsLoading(true)
+        setError(null)
+
+        // Query the allowedAddresses mapping for each address
+        const results = await Promise.all(
+          addressesToCheck.map(async (targetAddress) => {
+            try {
+              const isAllowed = (await publicClient.readContract({
+                address: addresses.defiInteractor,
+                abi: DEFI_INTERACTOR_ABI as any,
+                functionName: 'allowedAddresses',
+                args: [subAccountAddress, targetAddress],
+              } as any)) as boolean
+              return { address: targetAddress, isAllowed }
+            } catch {
+              return { address: targetAddress, isAllowed: false }
+            }
+          })
+        )
+
+        // Build set of allowed addresses
+        const allowed = new Set<`0x${string}`>()
+        results.forEach(({ address, isAllowed }) => {
+          if (isAllowed) {
+            allowed.add(address)
+          }
+        })
+
+        setAllowedAddresses(allowed)
+      } catch (err) {
+        console.error('Error checking allowed addresses:', err)
+        setError(err instanceof Error ? err : new Error('Failed to check allowed addresses'))
+      } finally {
+        setIsLoading(false)
+      }
+    }
+
+    checkAllowedAddresses()
+  }, [addresses.defiInteractor, publicClient, subAccountAddress, addressesToCheck])
+
+  return { allowedAddresses, isLoading, error }
 }
