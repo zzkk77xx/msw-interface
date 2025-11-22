@@ -39,18 +39,18 @@ export function createEip1193Provider(client: PublicClient, walletClient?: Walle
 
           case 'eth_call':
             return await client.call({
-              to: (paramsArray[0] as any).to,
-              data: (paramsArray[0] as any).data,
-              account: (paramsArray[0] as any).from,
-              value: (paramsArray[0] as any).value,
+              to: (paramsArray[0]).to,
+              data: (paramsArray[0]).data,
+              account: (paramsArray[0]).from,
+              value: (paramsArray[0]).value,
             })
 
           case 'eth_estimateGas':
             return await client.estimateGas({
-              to: (paramsArray[0] as any).to,
-              data: (paramsArray[0] as any).data,
-              account: (paramsArray[0] as any).from,
-              value: (paramsArray[0] as any).value,
+              to: (paramsArray[0]).to,
+              data: (paramsArray[0]).data,
+              account: (paramsArray[0]).from,
+              value: (paramsArray[0]).value,
             })
 
           case 'eth_blockNumber':

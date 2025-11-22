@@ -61,6 +61,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
       setSuccessMessage(null)
 
       const data = encodeContractCall(
+        addresses.defiInteractor,
         DEFI_INTERACTOR_ABI,
         'setSubAccountLimits',
         [
@@ -77,7 +78,9 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
         data,
       })
 
-      setSuccessMessage('Spending limits proposed to Safe multisig. Other signers need to approve it.')
+      setSuccessMessage(
+        'Spending limits proposed to Safe multisig. Other signers need to approve it.'
+      )
     } catch (error) {
       console.error('Error proposing limits:', error)
       alert('Failed to propose transaction. Make sure you are a Safe signer.')
@@ -100,27 +103,19 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
                   <p className="text-muted-foreground">Deposit Limit</p>
-                  <p className="font-medium">
-                    {(Number(currentLimits[0]) / 100).toFixed(2)}%
-                  </p>
+                  <p className="font-medium">{(Number(currentLimits[0]) / 100).toFixed(2)}%</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Withdraw Limit</p>
-                  <p className="font-medium">
-                    {(Number(currentLimits[1]) / 100).toFixed(2)}%
-                  </p>
+                  <p className="font-medium">{(Number(currentLimits[1]) / 100).toFixed(2)}%</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Max Loss</p>
-                  <p className="font-medium">
-                    {(Number(currentLimits[2]) / 100).toFixed(2)}%
-                  </p>
+                  <p className="font-medium">{(Number(currentLimits[2]) / 100).toFixed(2)}%</p>
                 </div>
                 <div>
                   <p className="text-muted-foreground">Window Duration</p>
-                  <p className="font-medium">
-                    {(Number(currentLimits[3]) / 3600).toFixed(0)}h
-                  </p>
+                  <p className="font-medium">{(Number(currentLimits[3]) / 3600).toFixed(0)}h</p>
                 </div>
               </div>
             </div>
@@ -130,7 +125,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
                 Deposit Limit (% of portfolio)
-                <Badge variant="outline" className="text-xs">Per Window</Badge>
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                >
+                  Per Window
+                </Badge>
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
@@ -139,7 +139,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
                   max="100"
                   step="0.5"
                   value={depositLimit}
-                  onChange={(e) => setDepositLimit(e.target.value)}
+                  onChange={e => setDepositLimit(e.target.value)}
                   placeholder="10"
                 />
                 <span className="text-sm text-muted-foreground">%</span>
@@ -152,7 +152,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
                 Withdraw Limit (% of portfolio)
-                <Badge variant="outline" className="text-xs">Per Window</Badge>
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                >
+                  Per Window
+                </Badge>
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
@@ -161,7 +166,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
                   max="100"
                   step="0.5"
                   value={withdrawLimit}
-                  onChange={(e) => setWithdrawLimit(e.target.value)}
+                  onChange={e => setWithdrawLimit(e.target.value)}
                   placeholder="10"
                 />
                 <span className="text-sm text-muted-foreground">%</span>
@@ -174,7 +179,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
                 Maximum Loss Tolerance
-                <Badge variant="destructive" className="text-xs">Risk Limit</Badge>
+                <Badge
+                  variant="destructive"
+                  className="text-xs"
+                >
+                  Risk Limit
+                </Badge>
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
@@ -183,7 +193,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
                   max="100"
                   step="0.5"
                   value={lossLimit}
-                  onChange={(e) => setLossLimit(e.target.value)}
+                  onChange={e => setLossLimit(e.target.value)}
                   placeholder="5"
                 />
                 <span className="text-sm text-muted-foreground">%</span>
@@ -196,7 +206,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
                 Time Window Duration
-                <Badge variant="outline" className="text-xs">Hours</Badge>
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                >
+                  Hours
+                </Badge>
               </label>
               <div className="flex items-center gap-2 mt-1">
                 <Input
@@ -205,7 +220,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
                   max="168"
                   step="1"
                   value={windowHours}
-                  onChange={(e) => setWindowHours(e.target.value)}
+                  onChange={e => setWindowHours(e.target.value)}
                   placeholder="24"
                 />
                 <span className="text-sm text-muted-foreground">hours</span>
@@ -242,16 +257,10 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
             </Button>
 
             {successMessage && (
-              <p className="text-sm text-green-600 mt-2 text-center">
-                ✓ {successMessage}
-              </p>
+              <p className="text-sm text-green-600 mt-2 text-center">✓ {successMessage}</p>
             )}
 
-            {error && (
-              <p className="text-sm text-red-600 mt-2 text-center">
-                ✗ {error}
-              </p>
-            )}
+            {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {error}</p>}
           </div>
         </div>
       </CardContent>

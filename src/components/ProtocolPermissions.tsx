@@ -93,6 +93,7 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
       setSuccessMessage(null)
 
       const data = encodeContractCall(
+        addresses.defiInteractor,
         DEFI_INTERACTOR_ABI,
         'setAllowedAddresses',
         [subAccountAddress, allowedAddresses, true]
@@ -103,7 +104,9 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
         data,
       })
 
-      setSuccessMessage('Protocol permissions proposed to Safe multisig. Other signers need to approve it.')
+      setSuccessMessage(
+        'Protocol permissions proposed to Safe multisig. Other signers need to approve it.'
+      )
     } catch (error) {
       console.error('Error proposing permissions:', error)
       alert('Failed to propose transaction. Make sure you are a Safe signer.')
@@ -120,13 +123,16 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
-          {PROTOCOLS.map((protocol) => {
+          {PROTOCOLS.map(protocol => {
             const selectedPools = selectedProtocols.get(protocol.id)
             const hasSelectedPools = selectedPools && selectedPools.size > 0
             const isExpanded = expandedProtocol === protocol.id
 
             return (
-              <div key={protocol.id} className="border rounded-lg p-4">
+              <div
+                key={protocol.id}
+                className="border rounded-lg p-4"
+              >
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-3 flex-1">
                     <Checkbox
@@ -135,18 +141,22 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
                       onChange={() => toggleProtocol(protocol.id)}
                       label=""
                     />
-                    <div className="flex-1 cursor-pointer" onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}>
+                    <div
+                      className="flex-1 cursor-pointer"
+                      onClick={() => setExpandedProtocol(isExpanded ? null : protocol.id)}
+                    >
                       <div className="flex items-center gap-2">
                         <p className="font-medium">{protocol.name}</p>
                         {hasSelectedPools && (
-                          <Badge variant="secondary" className="text-xs">
+                          <Badge
+                            variant="secondary"
+                            className="text-xs"
+                          >
                             {selectedPools.size} pool{selectedPools.size !== 1 ? 's' : ''}
                           </Badge>
                         )}
                       </div>
-                      <p className="text-xs text-muted-foreground mt-0.5">
-                        {protocol.description}
-                      </p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{protocol.description}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
@@ -171,7 +181,7 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
 
                 {isExpanded && (
                   <div className="ml-8 mt-3 space-y-2 border-l-2 border-muted pl-4">
-                    {protocol.pools.map((pool) => (
+                    {protocol.pools.map(pool => (
                       <PoolCheckbox
                         key={pool.id}
                         pool={pool}
@@ -195,16 +205,10 @@ export function ProtocolPermissions({ subAccountAddress }: ProtocolPermissionsPr
             </Button>
 
             {successMessage && (
-              <p className="text-sm text-green-600 mt-2 text-center">
-                ✓ {successMessage}
-              </p>
+              <p className="text-sm text-green-600 mt-2 text-center">✓ {successMessage}</p>
             )}
 
-            {error && (
-              <p className="text-sm text-red-600 mt-2 text-center">
-                ✗ {error}
-              </p>
-            )}
+            {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {error}</p>}
           </div>
         </div>
       </CardContent>
@@ -233,13 +237,14 @@ function PoolCheckbox({ pool, checked, onToggle }: PoolCheckboxProps) {
       >
         <div className="flex items-center gap-2">
           <p className="text-sm font-medium">{pool.name}</p>
-          <Badge variant="outline" className="text-xs">
+          <Badge
+            variant="outline"
+            className="text-xs"
+          >
             {pool.token}
           </Badge>
         </div>
-        <p className="text-xs text-muted-foreground mt-0.5">
-          {pool.description}
-        </p>
+        <p className="text-xs text-muted-foreground mt-0.5">{pool.description}</p>
       </label>
     </div>
   )

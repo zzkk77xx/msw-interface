@@ -16,11 +16,11 @@ export function SubAccountDashboard() {
   const [timeRemaining, setTimeRemaining] = useState<string>('')
 
   // Read limits and windows using hooks
-  const { data: limits } = useSubAccountLimits(address as `0x${string}` | undefined)
+  const { data: limits } = useSubAccountLimits(address)
   const { data: portfolioValue } = usePortfolioValue()
-  const { data: depositWindow } = useDepositWindow(address as `0x${string}` | undefined)
-  const { data: withdrawWindow } = useWithdrawWindow(address as `0x${string}` | undefined)
-  const { data: transferWindow } = useTransferWindow(address as `0x${string}` | undefined)
+  const { data: depositWindow } = useDepositWindow(address)
+  const { data: withdrawWindow } = useWithdrawWindow(address)
+  const { data: transferWindow } = useTransferWindow(address)
 
   // Calculate time remaining until window resets
   useEffect(() => {
@@ -213,7 +213,7 @@ function AllocationCard({
 
         {usedPercentage >= 90 && (
           <div className={`p-2 ${lightBgColor} rounded text-xs ${textColor}`}>
-            You've used {usedPercentage.toFixed(0)}% of your {title.toLowerCase()}.
+            You&apos;ve used {usedPercentage.toFixed(0)}% of your {title.toLowerCase()}.
             Limits will reset when the window expires.
           </div>
         )}

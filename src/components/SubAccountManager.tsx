@@ -50,9 +50,10 @@ export function SubAccountManager() {
       // Propose each role grant as a separate transaction to the Safe
       for (const roleId of rolesToGrant) {
         const data = encodeContractCall(
+          addresses.defiInteractor,
           DEFI_INTERACTOR_ABI,
           'grantRole',
-          [newSubAccount as `0x${string}`, roleId]
+          [newSubAccount, roleId]
         )
 
         await proposeTransaction({
@@ -62,7 +63,7 @@ export function SubAccountManager() {
       }
 
       // Add to managed list
-      setManagedAccounts(prev => new Set(prev).add(newSubAccount as `0x${string}`))
+      setManagedAccounts(prev => new Set(prev).add(newSubAccount))
 
       // Reset form
       setNewSubAccount('')
@@ -83,18 +84,19 @@ export function SubAccountManager() {
     try {
       setSuccessMessage(null)
 
-      const data = encodeContractCall(
-        DEFI_INTERACTOR_ABI,
-        'revokeRole',
-        [account, roleId]
-      )
+      const data = encodeContractCall(addresses.defiInteractor, DEFI_INTERACTOR_ABI, 'revokeRole', [
+        account,
+        roleId,
+      ])
 
       await proposeTransaction({
         to: addresses.defiInteractor,
         data,
       })
 
-      setSuccessMessage('Revoke transaction proposed to Safe multisig. Other signers need to approve it.')
+      setSuccessMessage(
+        'Revoke transaction proposed to Safe multisig. Other signers need to approve it.'
+      )
     } catch (error) {
       console.error('Error proposing role revoke:', error)
       alert('Failed to propose transaction. Make sure you are a Safe signer.')
@@ -123,9 +125,7 @@ export function SubAccountManager() {
       <Card>
         <CardHeader>
           <CardTitle>Add Sub-Account</CardTitle>
-          <CardDescription>
-            Grant DeFi permissions to an Ethereum address
-          </CardDescription>
+          <CardDescription>Grant DeFi permissions to an Ethereum address</CardDescription>
         </CardHeader>
         <CardContent>
           <div className="space-y-4">
@@ -135,7 +135,7 @@ export function SubAccountManager() {
                 type="text"
                 placeholder="0x..."
                 value={newSubAccount}
-                onChange={(e) => setNewSubAccount(e.target.value)}
+                onChange={e => setNewSubAccount(e.target.value)}
                 className="mt-1"
               />
             </div>
@@ -147,7 +147,7 @@ export function SubAccountManager() {
                 <Checkbox
                   id="deposit-role"
                   checked={grantDeposit}
-                  onChange={(e) => setGrantDeposit((e.target as HTMLInputElement).checked)}
+                  onChange={e => setGrantDeposit((e.target as HTMLInputElement).checked)}
                   label={ROLE_NAMES[ROLES.DEFI_DEPOSIT_ROLE]}
                 />
                 <p className="text-xs text-muted-foreground ml-6">
@@ -159,7 +159,7 @@ export function SubAccountManager() {
                 <Checkbox
                   id="withdraw-role"
                   checked={grantWithdraw}
-                  onChange={(e) => setGrantWithdraw((e.target as HTMLInputElement).checked)}
+                  onChange={e => setGrantWithdraw((e.target as HTMLInputElement).checked)}
                   label={ROLE_NAMES[ROLES.DEFI_WITHDRAW_ROLE]}
                 />
                 <p className="text-xs text-muted-foreground ml-6">
@@ -176,17 +176,9 @@ export function SubAccountManager() {
               {isPending ? 'Proposing to Safe...' : 'Propose Sub-Account'}
             </Button>
 
-            {successMessage && (
-              <p className="text-sm text-green-600">
-                ✓ {successMessage}
-              </p>
-            )}
+            {successMessage && <p className="text-sm text-green-600">✓ {successMessage}</p>}
 
-            {error && (
-              <p className="text-sm text-red-600">
-                ✗ {error}
-              </p>
-            )}
+            {error && <p className="text-sm text-red-600">✗ {error}</p>}
           </div>
         </CardContent>
       </Card>
@@ -195,9 +187,7 @@ export function SubAccountManager() {
       <Card>
         <CardHeader>
           <CardTitle>Managed Sub-Accounts</CardTitle>
-          <CardDescription>
-            View and manage existing sub-accounts
-          </CardDescription>
+          <CardDescription>View and manage existing sub-accounts</CardDescription>
         </CardHeader>
         <CardContent>
           {managedAccounts.size === 0 ? (
@@ -206,7 +196,7 @@ export function SubAccountManager() {
             </p>
           ) : (
             <div className="space-y-3">
-              {Array.from(managedAccounts).map((account) => (
+              {Array.from(managedAccounts).map(account => (
                 <SubAccountRow
                   key={account}
                   account={account}
@@ -244,17 +234,28 @@ function SubAccountRow({ account, onRevokeRole, isRevoking }: SubAccountRowProps
           </p>
           <div className="flex gap-2 mt-2">
             {hasDepositRole && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge
+                variant="secondary"
+                className="text-xs"
+              >
                 {ROLE_NAMES[ROLES.DEFI_DEPOSIT_ROLE]}
               </Badge>
             )}
             {hasWithdrawRole && (
-              <Badge variant="secondary" className="text-xs">
+              <Badge
+                variant="secondary"
+                className="text-xs"
+              >
                 {ROLE_NAMES[ROLES.DEFI_WITHDRAW_ROLE]}
               </Badge>
             )}
             {!hasDepositRole && !hasWithdrawRole && (
-              <Badge variant="outline" className="text-xs">No Roles</Badge>
+              <Badge
+                variant="outline"
+                className="text-xs"
+              >
+                No Roles
+              </Badge>
             )}
           </div>
         </div>

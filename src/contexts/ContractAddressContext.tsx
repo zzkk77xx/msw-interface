@@ -42,17 +42,17 @@ export function ContractAddressProvider({ children }: ContractAddressProviderPro
 
     // Priority: URL params > localStorage > env variables
     if (defiInteractorParam && isAddress(defiInteractorParam)) {
-      newAddresses.defiInteractor = defiInteractorParam as `0x${string}`
+      newAddresses.defiInteractor = defiInteractorParam
       localStorage.setItem('defiInteractor', defiInteractorParam)
     } else if (savedDefiInteractor && isAddress(savedDefiInteractor)) {
-      newAddresses.defiInteractor = savedDefiInteractor as `0x${string}`
+      newAddresses.defiInteractor = savedDefiInteractor
     } 
     
     if (safeParam && isAddress(safeParam)) {
-      newAddresses.safe = safeParam as `0x${string}`
+      newAddresses.safe = safeParam
       localStorage.setItem('safe', safeParam)
     } else if (savedSafe && isAddress(savedSafe)) {
-      newAddresses.safe = savedSafe as `0x${string}`
+      newAddresses.safe = savedSafe
     }
 
     setAddresses(newAddresses)

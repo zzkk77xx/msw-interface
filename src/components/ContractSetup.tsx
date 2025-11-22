@@ -18,7 +18,7 @@ export function ContractSetup() {
     }
 
     setError('')
-    setDefiInteractor(defiInteractorInput as `0x${string}`)
+    setDefiInteractor(defiInteractorInput)
     setDefiInteractorInput('')
   }
 
