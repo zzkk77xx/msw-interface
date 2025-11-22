@@ -67,14 +67,14 @@ export function ManagedAccountsList() {
                   </p>
                 </div>
                 <div className="flex gap-2">
-                  {account.hasDepositRole && (
+                  {account.hasExecuteRole && (
                     <Badge variant="secondary" className="text-xs">
-                      {ROLE_NAMES[ROLES.DEFI_DEPOSIT_ROLE]}
+                      {ROLE_NAMES[ROLES.DEFI_EXECUTE_ROLE]}
                     </Badge>
                   )}
-                  {account.hasWithdrawRole && (
+                  {account.hasTransferRole && (
                     <Badge variant="secondary" className="text-xs">
-                      {ROLE_NAMES[ROLES.DEFI_WITHDRAW_ROLE]}
+                      {ROLE_NAMES[ROLES.DEFI_TRANSFER_ROLE]}
                     </Badge>
                   )}
                 </div>

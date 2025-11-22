@@ -726,24 +726,18 @@ export const DEFI_INTERACTOR_ABI = [
 
 // Role constants
 export const ROLES = {
-  DEFI_DEPOSIT_ROLE: 1,
-  DEFI_WITHDRAW_ROLE: 2,
-  DEFI_EXECUTE_ROLE: 3,
-  DEFI_TRANSFER_ROLE: 4,
+  DEFI_EXECUTE_ROLE: 1,
+  DEFI_TRANSFER_ROLE: 2,
 } as const
 
 export const ROLE_NAMES = {
-  [ROLES.DEFI_DEPOSIT_ROLE]: 'Deposit',
-  [ROLES.DEFI_WITHDRAW_ROLE]: 'Withdraw',
   [ROLES.DEFI_EXECUTE_ROLE]: 'Execute',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Transfer',
 } as const
 
 export const ROLE_DESCRIPTIONS = {
-  [ROLES.DEFI_DEPOSIT_ROLE]: 'Can deposit to DeFi Vaults (configurable % per window)',
-  [ROLES.DEFI_WITHDRAW_ROLE]: 'Can withdraw from DeFi Vaults (configurable % per window)',
   [ROLES.DEFI_EXECUTE_ROLE]:
-    'Can execute generic protocol interactions (limited by portfolio loss %)',
+    'Can execute protocol interactions and approvals (limited by portfolio loss %)',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Can transfer tokens from Safe (configurable % per window)',
 } as const
 

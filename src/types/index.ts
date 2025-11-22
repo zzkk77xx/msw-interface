@@ -1,7 +1,7 @@
 export interface SubAccount {
   address: `0x${string}`
-  hasDepositRole: boolean
-  hasWithdrawRole: boolean
+  hasExecuteRole: boolean
+  hasTransferRole: boolean
   addedAt?: number
 }
 

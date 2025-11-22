@@ -16,8 +16,8 @@ export function SubAccountManager() {
   const { addresses } = useContractAddresses()
   const { isSafeOwner } = useIsSafeOwner()
   const [newSubAccount, setNewSubAccount] = useState('')
-  const [grantDeposit, setGrantDeposit] = useState(false)
-  const [grantWithdraw, setGrantWithdraw] = useState(false)
+  const [grantExecute, setGrantExecute] = useState(false)
+  const [grantTransfer, setGrantTransfer] = useState(false)
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
 
   // Fetch managed accounts from contract
@@ -32,7 +32,7 @@ export function SubAccountManager() {
       return
     }
 
-    if (!grantDeposit && !grantWithdraw) {
+    if (!grantExecute && !grantTransfer) {
       alert('Please select at least one role to grant')
       return
     }
@@ -46,8 +46,8 @@ export function SubAccountManager() {
       setSuccessMessage(null)
 
       const rolesToGrant: number[] = []
-      if (grantDeposit) rolesToGrant.push(ROLES.DEFI_DEPOSIT_ROLE)
-      if (grantWithdraw) rolesToGrant.push(ROLES.DEFI_WITHDRAW_ROLE)
+      if (grantExecute) rolesToGrant.push(ROLES.DEFI_EXECUTE_ROLE)
+      if (grantTransfer) rolesToGrant.push(ROLES.DEFI_TRANSFER_ROLE)
 
       // Create an array of transactions to batch them
       const transactions = rolesToGrant.map(roleId => ({
@@ -69,8 +69,8 @@ export function SubAccountManager() {
 
         // Reset form
         setNewSubAccount('')
-        setGrantDeposit(false)
-        setGrantWithdraw(false)
+        setGrantExecute(false)
+        setGrantTransfer(false)
 
         setSuccessMessage(`Transaction executed successfully! Hash: ${result.transactionHash}`)
       } else {
@@ -158,25 +158,25 @@ export function SubAccountManager() {
 
               <div className="space-y-2">
                 <Checkbox
-                  id="deposit-role"
-                  checked={grantDeposit}
-                  onChange={e => setGrantDeposit((e.target as HTMLInputElement).checked)}
-                  label={ROLE_NAMES[ROLES.DEFI_DEPOSIT_ROLE]}
+                  id="execute-role"
+                  checked={grantExecute}
+                  onChange={e => setGrantExecute((e.target as HTMLInputElement).checked)}
+                  label={ROLE_NAMES[ROLES.DEFI_EXECUTE_ROLE]}
                 />
                 <p className="text-xs text-muted-foreground ml-6">
-                  {ROLE_DESCRIPTIONS[ROLES.DEFI_DEPOSIT_ROLE]}
+                  {ROLE_DESCRIPTIONS[ROLES.DEFI_EXECUTE_ROLE]}
                 </p>
               </div>
 
               <div className="space-y-2">
                 <Checkbox
-                  id="withdraw-role"
-                  checked={grantWithdraw}
-                  onChange={e => setGrantWithdraw((e.target as HTMLInputElement).checked)}
-                  label={ROLE_NAMES[ROLES.DEFI_WITHDRAW_ROLE]}
+                  id="transfer-role"
+                  checked={grantTransfer}
+                  onChange={e => setGrantTransfer((e.target as HTMLInputElement).checked)}
+                  label={ROLE_NAMES[ROLES.DEFI_TRANSFER_ROLE]}
                 />
                 <p className="text-xs text-muted-foreground ml-6">
-                  {ROLE_DESCRIPTIONS[ROLES.DEFI_WITHDRAW_ROLE]}
+                  {ROLE_DESCRIPTIONS[ROLES.DEFI_TRANSFER_ROLE]}
                 </p>
               </div>
             </div>
@@ -237,8 +237,8 @@ function SubAccountRow({ account, onRevokeRole, isRevoking }: SubAccountRowProps
   const [isExpanded, setIsExpanded] = useState(false)
 
   // Check which roles the account has
-  const { data: hasDepositRole } = useHasRole(account, ROLES.DEFI_DEPOSIT_ROLE)
-  const { data: hasWithdrawRole } = useHasRole(account, ROLES.DEFI_WITHDRAW_ROLE)
+  const { data: hasExecuteRole } = useHasRole(account, ROLES.DEFI_EXECUTE_ROLE)
+  const { data: hasTransferRole } = useHasRole(account, ROLES.DEFI_TRANSFER_ROLE)
 
   return (
     <div className="border rounded-lg overflow-hidden">
@@ -248,23 +248,23 @@ function SubAccountRow({ account, onRevokeRole, isRevoking }: SubAccountRowProps
             {account.slice(0, 6)}...{account.slice(-4)}
           </p>
           <div className="flex gap-2 mt-2">
-            {hasDepositRole && (
+            {hasExecuteRole && (
               <Badge
                 variant="secondary"
                 className="text-xs"
               >
-                {ROLE_NAMES[ROLES.DEFI_DEPOSIT_ROLE]}
+                {ROLE_NAMES[ROLES.DEFI_EXECUTE_ROLE]}
               </Badge>
             )}
-            {hasWithdrawRole && (
+            {hasTransferRole && (
               <Badge
                 variant="secondary"
                 className="text-xs"
               >
-                {ROLE_NAMES[ROLES.DEFI_WITHDRAW_ROLE]}
+                {ROLE_NAMES[ROLES.DEFI_TRANSFER_ROLE]}
               </Badge>
             )}
-            {!hasDepositRole && !hasWithdrawRole && (
+            {!hasExecuteRole && !hasTransferRole && (
               <Badge
                 variant="outline"
                 className="text-xs"
@@ -282,24 +282,24 @@ function SubAccountRow({ account, onRevokeRole, isRevoking }: SubAccountRowProps
           >
             {isExpanded ? 'Hide Config' : 'Configure'}
           </Button>
-          {hasDepositRole && (
+          {hasExecuteRole && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onRevokeRole(account, ROLES.DEFI_DEPOSIT_ROLE)}
+              onClick={() => onRevokeRole(account, ROLES.DEFI_EXECUTE_ROLE)}
               disabled={isRevoking}
             >
-              Revoke Deposit
+              Revoke Execute
             </Button>
           )}
-          {hasWithdrawRole && (
+          {hasTransferRole && (
             <Button
               size="sm"
               variant="outline"
-              onClick={() => onRevokeRole(account, ROLES.DEFI_WITHDRAW_ROLE)}
+              onClick={() => onRevokeRole(account, ROLES.DEFI_TRANSFER_ROLE)}
               disabled={isRevoking}
             >
-              Revoke Withdraw
+              Revoke Transfer
             </Button>
           )}
         </div>

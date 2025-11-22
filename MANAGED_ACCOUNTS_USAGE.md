@@ -6,9 +6,15 @@ This document explains how to fetch managed accounts from the DeFi Interactor co
 
 The `useManagedAccounts` hook fetches all addresses that have been granted roles in the DeFi Interactor contract. It works by:
 
-1. Calling `getSubaccountsByRole(DEFI_DEPOSIT_ROLE)` to get all deposit accounts
-2. Calling `getSubaccountsByRole(DEFI_WITHDRAW_ROLE)` to get all withdraw accounts
+1. Calling `getSubaccountsByRole(DEFI_EXECUTE_ROLE)` to get all accounts with execute permission
+2. Calling `getSubaccountsByRole(DEFI_TRANSFER_ROLE)` to get all accounts with transfer permission
 3. Merging the results and building a list of unique addresses with their current role status
+
+## Role Types
+
+The contract supports two role types:
+- **DEFI_EXECUTE_ROLE (1)**: Can execute protocol interactions and approvals (limited by portfolio loss %)
+- **DEFI_TRANSFER_ROLE (2)**: Can transfer tokens from Safe (configurable % per window)
 
 ## Hook Location
 
@@ -36,9 +42,9 @@ Where `SubAccount` is defined as:
 ```typescript
 interface SubAccount {
   address: `0x${string}`
-  hasDepositRole: boolean
-  hasWithdrawRole: boolean
-  addedAt?: number  // Unix timestamp when first role was granted
+  hasExecuteRole: boolean
+  hasTransferRole: boolean
+  addedAt?: number  // Unix timestamp when first role was granted (optional)
 }
 ```
 
@@ -67,8 +73,8 @@ export function MyComponent() {
         {accounts.map(account => (
           <li key={account.address}>
             {account.address}
-            {account.hasDepositRole && ' - Has Deposit Role'}
-            {account.hasWithdrawRole && ' - Has Withdraw Role'}
+            {account.hasExecuteRole && ' - Has Execute Role'}
+            {account.hasTransferRole && ' - Has Transfer Role'}
           </li>
         ))}
       </ul>
@@ -85,8 +91,8 @@ See `src/components/ManagedAccountsList.tsx` for a complete example component th
 
 The hook uses the Wagmi `usePublicClient` to call contract view functions:
 
-1. **Fetches deposit accounts**: Calls `getSubaccountsByRole(DEFI_DEPOSIT_ROLE)` to get all addresses with deposit role
-2. **Fetches withdraw accounts**: Calls `getSubaccountsByRole(DEFI_WITHDRAW_ROLE)` to get all addresses with withdraw role
+1. **Fetches execute accounts**: Calls `getSubaccountsByRole(DEFI_EXECUTE_ROLE)` to get all addresses with execute role
+2. **Fetches transfer accounts**: Calls `getSubaccountsByRole(DEFI_TRANSFER_ROLE)` to get all addresses with transfer role
 3. **Merges results**: Builds a map of unique addresses and combines their role status
 4. **Returns array**: Returns a list of all accounts with at least one active role
 

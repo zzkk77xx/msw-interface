@@ -180,41 +180,41 @@ export function useManagedAccounts() {
         setError(null)
 
         // Fetch accounts for each role using the contract's getter functions
-        const [depositAccounts, withdrawAccounts] = await Promise.all([
+        const [executeAccounts, transferAccounts] = await Promise.all([
           publicClient.readContract({
             address: addresses.defiInteractor,
             abi: DEFI_INTERACTOR_ABI,
             functionName: 'getSubaccountsByRole',
-            args: [ROLES.DEFI_DEPOSIT_ROLE],
+            args: [ROLES.DEFI_EXECUTE_ROLE],
           }) as Promise<`0x${string}`[]>,
           publicClient.readContract({
             address: addresses.defiInteractor,
             abi: DEFI_INTERACTOR_ABI,
             functionName: 'getSubaccountsByRole',
-            args: [ROLES.DEFI_WITHDRAW_ROLE],
+            args: [ROLES.DEFI_TRANSFER_ROLE],
           }) as Promise<`0x${string}`[]>,
         ])
 
         // Build a map of addresses and their roles
-        const accountMap = new Map<`0x${string}`, { depositRole: boolean; withdrawRole: boolean }>()
+        const accountMap = new Map<`0x${string}`, { executeRole: boolean; transferRole: boolean }>()
 
-        // Add deposit role accounts
-        for (const address of depositAccounts) {
+        // Add execute role accounts
+        for (const address of executeAccounts) {
           accountMap.set(address, {
-            depositRole: true,
-            withdrawRole: false,
+            executeRole: true,
+            transferRole: false,
           })
         }
 
-        // Add withdraw role accounts
-        for (const address of withdrawAccounts) {
+        // Add transfer role accounts
+        for (const address of transferAccounts) {
           const existing = accountMap.get(address)
           if (existing) {
-            existing.withdrawRole = true
+            existing.transferRole = true
           } else {
             accountMap.set(address, {
-              depositRole: false,
-              withdrawRole: true,
+              executeRole: false,
+              transferRole: true,
             })
           }
         }
@@ -223,8 +223,8 @@ export function useManagedAccounts() {
         const accountList: SubAccount[] = Array.from(accountMap.entries()).map(
           ([address, roles]) => ({
             address,
-            hasDepositRole: roles.depositRole,
-            hasWithdrawRole: roles.withdrawRole,
+            hasExecuteRole: roles.executeRole,
+            hasTransferRole: roles.transferRole,
           })
         )
 

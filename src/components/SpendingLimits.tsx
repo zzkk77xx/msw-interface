@@ -18,8 +18,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
   // Read current limits using hook
   const { data: currentLimits } = useSubAccountLimits(subAccountAddress)
 
-  const [depositLimit, setDepositLimit] = useState('10') // Default 10%
-  const [withdrawLimit, setWithdrawLimit] = useState('10') // Default 10%
+  const [transferLimit, setTransferLimit] = useState('10') // Default 10%
   const [lossLimit, setLossLimit] = useState('5') // Default 5%
   const [windowHours, setWindowHours] = useState('24') // Default 24 hours
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
@@ -27,18 +26,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
   const { proposeTransaction, isPending, error } = useSafeProposal()
 
   const handleSaveLimits = async () => {
-    const depositBps = Math.floor(parseFloat(depositLimit) * 100)
-    const withdrawBps = Math.floor(parseFloat(withdrawLimit) * 100)
+    const transferBps = Math.floor(parseFloat(transferLimit) * 100)
     const lossBps = Math.floor(parseFloat(lossLimit) * 100)
     const windowSeconds = Math.floor(parseFloat(windowHours) * 3600)
 
-    if (depositBps < 0 || depositBps > 10000) {
-      alert('Deposit limit must be between 0% and 100%')
-      return
-    }
-
-    if (withdrawBps < 0 || withdrawBps > 10000) {
-      alert('Withdraw limit must be between 0% and 100%')
+    if (transferBps < 0 || transferBps > 10000) {
+      alert('Transfer limit must be between 0% and 100%')
       return
     }
 
@@ -62,13 +55,12 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
 
       const data = encodeContractCall(
         addresses.defiInteractor,
-        DEFI_INTERACTOR_ABI,
+        DEFI_INTERACTOR_ABI as any[],
         'setSubAccountLimits',
         [
           subAccountAddress,
-          BigInt(depositBps),
-          BigInt(withdrawBps),
           BigInt(lossBps),
+          BigInt(transferBps),
           BigInt(windowSeconds),
         ]
       )
@@ -107,20 +99,16 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
               <p className="text-sm font-medium mb-2">Current Limits</p>
               <div className="grid grid-cols-2 gap-3 text-xs">
                 <div>
-                  <p className="text-muted-foreground">Deposit Limit</p>
+                  <p className="text-muted-foreground">Max Loss (Execute)</p>
                   <p className="font-medium">{(Number(currentLimits[0]) / 100).toFixed(2)}%</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Withdraw Limit</p>
+                  <p className="text-muted-foreground">Transfer Limit</p>
                   <p className="font-medium">{(Number(currentLimits[1]) / 100).toFixed(2)}%</p>
                 </div>
                 <div>
-                  <p className="text-muted-foreground">Max Loss</p>
-                  <p className="font-medium">{(Number(currentLimits[2]) / 100).toFixed(2)}%</p>
-                </div>
-                <div>
                   <p className="text-muted-foreground">Window Duration</p>
-                  <p className="font-medium">{(Number(currentLimits[3]) / 3600).toFixed(0)}h</p>
+                  <p className="font-medium">{(Number(currentLimits[2]) / 3600).toFixed(0)}h</p>
                 </div>
               </div>
             </div>
@@ -129,61 +117,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
           <div className="space-y-4">
             <div>
               <label className="text-sm font-medium flex items-center gap-2">
-                Deposit Limit (% of portfolio)
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                >
-                  Per Window
-                </Badge>
-              </label>
-              <div className="flex items-center gap-2 mt-1">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={depositLimit}
-                  onChange={e => setDepositLimit(e.target.value)}
-                  placeholder="10"
-                />
-                <span className="text-sm text-muted-foreground">%</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Maximum percentage of portfolio that can be deposited within the time window
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2">
-                Withdraw Limit (% of portfolio)
-                <Badge
-                  variant="outline"
-                  className="text-xs"
-                >
-                  Per Window
-                </Badge>
-              </label>
-              <div className="flex items-center gap-2 mt-1">
-                <Input
-                  type="number"
-                  min="0"
-                  max="100"
-                  step="0.5"
-                  value={withdrawLimit}
-                  onChange={e => setWithdrawLimit(e.target.value)}
-                  placeholder="10"
-                />
-                <span className="text-sm text-muted-foreground">%</span>
-              </div>
-              <p className="text-xs text-muted-foreground mt-1">
-                Maximum percentage of portfolio that can be withdrawn within the time window
-              </p>
-            </div>
-
-            <div>
-              <label className="text-sm font-medium flex items-center gap-2">
-                Maximum Loss Tolerance
+                Maximum Loss Tolerance (Execute Role)
                 <Badge
                   variant="destructive"
                   className="text-xs"
@@ -204,7 +138,34 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
                 <span className="text-sm text-muted-foreground">%</span>
               </div>
               <p className="text-xs text-muted-foreground mt-1">
-                Maximum portfolio value loss allowed from sub-account operations
+                Maximum portfolio value loss allowed from protocol interactions and approvals
+              </p>
+            </div>
+
+            <div>
+              <label className="text-sm font-medium flex items-center gap-2">
+                Transfer Limit (% of portfolio)
+                <Badge
+                  variant="outline"
+                  className="text-xs"
+                >
+                  Per Window
+                </Badge>
+              </label>
+              <div className="flex items-center gap-2 mt-1">
+                <Input
+                  type="number"
+                  min="0"
+                  max="100"
+                  step="0.5"
+                  value={transferLimit}
+                  onChange={e => setTransferLimit(e.target.value)}
+                  placeholder="10"
+                />
+                <span className="text-sm text-muted-foreground">%</span>
+              </div>
+              <p className="text-xs text-muted-foreground mt-1">
+                Maximum percentage of portfolio that can be transferred within the time window
               </p>
             </div>
 
@@ -241,14 +202,13 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
               <p className="text-sm font-medium text-blue-900">Preview</p>
               <div className="text-xs text-blue-700 mt-1 space-y-1">
                 <p>
-                  Sub-account can deposit up to <strong>{depositLimit}%</strong> and withdraw up to{' '}
-                  <strong>{withdrawLimit}%</strong> of the portfolio value
+                  Sub-account can transfer up to <strong>{transferLimit}%</strong> of the portfolio value per window
                 </p>
                 <p>
                   Limits reset every <strong>{windowHours} hours</strong>
                 </p>
                 <p>
-                  Operations are blocked if portfolio loss exceeds <strong>{lossLimit}%</strong>
+                  Protocol executions are blocked if portfolio loss exceeds <strong>{lossLimit}%</strong>
                 </p>
               </div>
             </div>
@@ -265,7 +225,7 @@ export function SpendingLimits({ subAccountAddress }: SpendingLimitsProps) {
               <p className="text-sm text-green-600 mt-2 text-center">✓ {successMessage}</p>
             )}
 
-            {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {error}</p>}
+            {error && <p className="text-sm text-red-600 mt-2 text-center">✗ {String(error)}</p>}
           </div>
         </div>
       </CardContent>
