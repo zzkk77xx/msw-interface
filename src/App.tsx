@@ -4,6 +4,7 @@ import { SubAccountManager } from '@/components/SubAccountManager'
 import { EmergencyControls } from '@/components/EmergencyControls'
 import { MyPermissions } from '@/components/MyPermissions'
 import { ContractSetup } from '@/components/ContractSetup'
+import { ThemeToggle } from '@/components/ThemeToggle'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
 import { useIsSafeOwner } from '@/hooks/useSafe'
 
@@ -27,7 +28,10 @@ function App() {
                   : 'View your delegated DeFi permissions'}
               </p>
             </div>
-            <ConnectButton />
+            <div className="flex items-center gap-3">
+              <ThemeToggle />
+              <ConnectButton />
+            </div>
           </div>
 
           {/* Main Content - Conditional Layout */}

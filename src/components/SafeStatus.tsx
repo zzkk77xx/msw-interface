@@ -12,7 +12,7 @@ import { useIsSafeOwner, useSafeAddress } from "@/hooks/useSafe";
 export function SafeStatus() {
   const { address, isConnected } = useAccount();
   const { data: safeAddress } = useSafeAddress();
-  const { isSafeOwner } = useIsSafeOwner();
+  const { isSafeOwner, isLoading } = useIsSafeOwner();
 
   if (!isConnected) {
     return (
@@ -63,14 +63,15 @@ export function SafeStatus() {
           <div>
             <p className="text-sm text-muted-foreground">Permission Level</p>
             <div className="mt-1">
-              {isSafeOwner ? (
-                <Badge>Safe Owner</Badge>
+              {isLoading ? (
+                <Badge variant="outline">Checking...</Badge>
+              ) : isSafeOwner ? (
+                <Badge>Safe Signer</Badge>
               ) : (
                 <Badge variant="outline">Sub-Account / External</Badge>
               )}
             </div>
           </div>
-
         </div>
       </CardContent>
     </Card>

@@ -411,3 +411,21 @@ export const ROLE_DESCRIPTIONS = {
   [ROLES.DEFI_EXECUTE_ROLE]: 'Can execute generic protocol interactions (limited by portfolio loss %)',
   [ROLES.DEFI_TRANSFER_ROLE]: 'Can transfer tokens from Safe (configurable % per window)',
 } as const
+
+// Safe contract ABI
+export const SAFE_ABI = [
+  {
+    inputs: [],
+    name: 'getOwners',
+    outputs: [{ name: '', type: 'address[]' }],
+    stateMutability: 'view',
+    type: 'function'
+  },
+  {
+    inputs: [],
+    name: 'getThreshold',
+    outputs: [{ name: '', type: 'uint256' }],
+    stateMutability: 'view',
+    type: 'function'
+  }
+] as const
