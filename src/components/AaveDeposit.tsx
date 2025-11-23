@@ -1,5 +1,5 @@
-import { useState } from 'react'
-import { useAccount } from 'wagmi'
+import { useState, useEffect } from 'react'
+import { useAccount, useWriteContract, useWaitForTransactionReceipt } from 'wagmi'
 import { parseUnits, encodeFunctionData } from 'viem'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
@@ -8,68 +8,81 @@ import { Badge } from '@/components/ui/badge'
 import { DEFI_INTERACTOR_ABI, AAVE_V3_POOL_ABI, ROLES } from '@/lib/contracts'
 import { AAVE_PROTOCOL } from '@/lib/protocols'
 import { useContractAddresses } from '@/contexts/ContractAddressContext'
-import { useHasRole, useIsAddressAllowed } from '@/hooks/useSafe'
-import { useSafeProposal, encodeContractCall } from '@/hooks/useSafeProposal'
+import { useHasRole, useIsAddressAllowed, useSafeAddress } from '@/hooks/useSafe'
 
 export function AaveDeposit() {
   const { address } = useAccount()
   const { addresses } = useContractAddresses()
+  const { data: safeAddress } = useSafeAddress() // Fetch Safe address from contract
   const [selectedToken, setSelectedToken] = useState<string>('')
   const [amount, setAmount] = useState('')
   const [successMessage, setSuccessMessage] = useState<string | null>(null)
+  const [error, setError] = useState<string | null>(null)
+
+  const aavePool = AAVE_PROTOCOL.pools.find(p => p.address === selectedToken)
 
   // Check permissions
   const { data: hasExecuteRole } = useHasRole(address, ROLES.DEFI_EXECUTE_ROLE)
-  const { data: isAaveAllowed } = useIsAddressAllowed(address, AAVE_PROTOCOL.contractAddress)
+  const { data: isAaveAllowed } = useIsAddressAllowed(address, aavePool?.address)
 
-  // Use Safe proposal hook
-  const { proposeTransaction, isPending, error } = useSafeProposal()
+  // Use wagmi's writeContract for direct contract calls
+  const { writeContract, data: hash, isPending, error: writeError } = useWriteContract()
+  const { isLoading: isConfirming, isSuccess } = useWaitForTransactionReceipt({ hash })
 
   const selectedPool = AAVE_PROTOCOL.pools.find(p => p.address === selectedToken)
 
-  const handleApprove = async () => {
-    if (!selectedToken || !amount || !addresses.defiInteractor || !addresses.safe) {
-      alert('Please fill all fields and ensure contract is configured')
+  // Handle transaction success
+  useEffect(() => {
+    if (isSuccess && hash) {
+      setSuccessMessage(`Transaction successful! TX: ${hash}`)
+      setAmount('')
+    }
+  }, [isSuccess, hash])
+
+  // Handle transaction errors
+  useEffect(() => {
+    if (writeError) {
+      setError(`Transaction failed: ${writeError.message}`)
+    }
+  }, [writeError])
+
+  const handleApprove = () => {
+    console.log(selectedToken, amount, addresses.defiInteractor, safeAddress)
+    if (!selectedToken || !amount || !addresses.defiInteractor || !safeAddress) {
+      setError('Please fill all fields and ensure contract is configured')
       return
     }
 
     try {
       setSuccessMessage(null)
+      setError(null)
 
       const decimals = 6 // USDC/USDT decimals, adjust based on token
       const parsedAmount = parseUnits(amount, decimals)
 
-      const data = encodeContractCall(
-        addresses.defiInteractor,
-        DEFI_INTERACTOR_ABI,
-        'approveProtocol',
-        [selectedToken as `0x${string}`, AAVE_PROTOCOL.contractAddress, parsedAmount]
-      )
-
-      const result = await proposeTransaction({
-        to: addresses.defiInteractor,
-        data,
+      // Call approveProtocol directly on DeFi Interactor
+      writeContract({
+        address: addresses.defiInteractor,
+        abi: DEFI_INTERACTOR_ABI,
+        functionName: 'approveProtocol',
+        args: [aavePool?.tokenAddress as `0x${string}`, aavePool?.address as `0x${string}`, parsedAmount],
       })
-
-      if (result.success) {
-        setSuccessMessage(`Approval successful! TX: ${result.transactionHash}`)
-      } else {
-        throw result.error || new Error('Approval failed')
-      }
     } catch (err) {
       console.error('Approval error:', err)
-      alert(`Approval failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setError(`Approval failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
-  const handleSupply = async () => {
-    if (!selectedToken || !amount || !addresses.defiInteractor || !addresses.safe) {
-      alert('Please fill all fields and ensure contract is configured')
+  const handleSupply = () => {
+    console.log(selectedToken, amount, addresses.defiInteractor, safeAddress)
+    if (!selectedToken || !amount || !addresses.defiInteractor || !safeAddress) {
+      setError('Please fill all fields and ensure contract is configured')
       return
     }
 
     try {
       setSuccessMessage(null)
+      setError(null)
 
       const decimals = 6 // USDC/USDT decimals, adjust based on token
       const parsedAmount = parseUnits(amount, decimals)
@@ -81,33 +94,22 @@ export function AaveDeposit() {
         args: [
           selectedToken as `0x${string}`, // asset
           parsedAmount, // amount
-          addresses.safe, // onBehalfOf (Safe wallet)
+          safeAddress, // onBehalfOf (Safe wallet)
           0, // referralCode
         ],
       })
+      console.log(supplyData)
 
-      // Execute via DeFi Interactor
-      const data = encodeContractCall(
-        addresses.defiInteractor,
-        DEFI_INTERACTOR_ABI,
-        'executeOnProtocol',
-        [AAVE_PROTOCOL.contractAddress, supplyData]
-      )
-
-      const result = await proposeTransaction({
-        to: addresses.defiInteractor,
-        data,
+      // Call executeOnProtocol directly on DeFi Interactor
+      writeContract({
+        address: addresses.defiInteractor,
+        abi: DEFI_INTERACTOR_ABI,
+        functionName: 'executeOnProtocol',
+        args: [aavePool?.address as `0x${string}`, supplyData],
       })
-
-      if (result.success) {
-        setSuccessMessage(`Supply successful! TX: ${result.transactionHash}`)
-        setAmount('')
-      } else {
-        throw result.error || new Error('Supply failed')
-      }
     } catch (err) {
       console.error('Supply error:', err)
-      alert(`Supply failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
+      setError(`Supply failed: ${err instanceof Error ? err.message : 'Unknown error'}`)
     }
   }
 
@@ -131,7 +133,8 @@ export function AaveDeposit() {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-muted-foreground">
-            You need the Execute role to interact with Aave. Contact the Safe owner to grant you access.
+            You need the Execute role to interact with Aave. Contact the Safe owner to grant you
+            access.
           </p>
         </CardContent>
       </Card>
@@ -142,9 +145,7 @@ export function AaveDeposit() {
     <Card>
       <CardHeader>
         <CardTitle>Test Smart Contract - Aave Deposit</CardTitle>
-        <CardDescription>
-          Deposit tokens to Aave V3 through the DeFi Interactor
-        </CardDescription>
+        <CardDescription>Deposit tokens to Aave V3 through the DeFi Interactor</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="space-y-4">
@@ -190,8 +191,11 @@ export function AaveDeposit() {
             >
               <option value="">Choose a token...</option>
               {AAVE_PROTOCOL.pools.map(pool => (
-                <option key={pool.id} value={pool.address}>
-                  {pool.name} ({pool.token})
+                <option
+                  key={pool.id}
+                  value={pool.address}
+                >
+                  {pool.name} ({pool.tokenName})
                 </option>
               ))}
             </select>
@@ -215,7 +219,7 @@ export function AaveDeposit() {
               className="mt-1"
             />
             <p className="text-xs text-muted-foreground mt-1">
-              Amount of {selectedPool?.token || 'tokens'} to deposit to Aave
+              Amount of {selectedPool?.tokenName || 'tokens'} to deposit to Aave
             </p>
           </div>
 
@@ -223,19 +227,19 @@ export function AaveDeposit() {
           <div className="space-y-2">
             <Button
               onClick={handleApprove}
-              disabled={isPending || !selectedToken || !amount || !isAaveAllowed}
+              disabled={isPending || isConfirming || !selectedToken || !amount || !isAaveAllowed}
               className="w-full"
               variant="outline"
             >
-              {isPending ? 'Processing...' : '1. Approve Aave Pool'}
+              {isPending || isConfirming ? 'Processing...' : '1. Approve Aave Pool'}
             </Button>
 
             <Button
               onClick={handleSupply}
-              disabled={isPending || !selectedToken || !amount || !isAaveAllowed}
+              disabled={isPending || isConfirming || !selectedToken || !amount || !isAaveAllowed}
               className="w-full"
             >
-              {isPending ? 'Processing...' : '2. Supply to Aave'}
+              {isPending || isConfirming ? 'Processing...' : '2. Supply to Aave'}
             </Button>
           </div>
 

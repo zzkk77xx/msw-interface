@@ -3,7 +3,8 @@
 export interface ProtocolPool {
   id: string
   name: string
-  token: string
+  tokenName: string
+  tokenAddress?: `0x${string}`
   address: `0x${string}`
   description: string
 }
@@ -26,25 +27,28 @@ export const AAVE_PROTOCOL: Protocol = {
     {
       id: 'aave-usdc',
       name: 'USDC Pool',
-      token: 'USDC',
+      tokenName: 'USDC',
+      tokenAddress: '0x' as `0x${string}`, // USDC on Base
       address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913' as `0x${string}`, // USDC on Base
-      description: 'Lend and borrow USDC'
+      description: 'Lend and borrow USDC',
     },
     {
       id: 'aave-wbtc',
       name: 'WBTC Pool',
-      token: 'WBTC',
+      tokenName: 'WBTC',
+      tokenAddress: '0x29f2D40B0605204364af54EC677bD022dA425d03',
       address: '0x6Ae43d3271ff6888e7Fc43Fd7321a503ff738951' as `0x${string}`, // WETH on Base
-      description: 'Lend and borrow WBTC'
+      description: 'Lend and borrow WBTC',
     },
     {
       id: 'aave-usdt',
       name: 'USDT Pool',
-      token: 'USDT',
+      tokenName: 'USDT',
+      tokenAddress: '0x' as `0x${string}`,
       address: '0xfde4C96c8593536E31F229EA8f37b2ADa2699bb2' as `0x${string}`, // USDT on Base
-      description: 'Lend and borrow USDT'
-    }
-  ]
+      description: 'Lend and borrow USDT',
+    },
+  ],
 }
 
 // QuickSwap Protocol Configuration (Polygon)
@@ -57,25 +61,25 @@ export const QUICKSWAP_PROTOCOL: Protocol = {
     {
       id: 'quickswap-matic-usdc',
       name: 'MATIC-USDC',
-      token: 'MATIC/USDC',
+      tokenName: 'MATIC/USDC',
       address: '0x6e7a5FAFcec6BB1e78bAE2A1F0B612012BF14827' as `0x${string}`,
-      description: 'Trade and provide liquidity for MATIC/USDC'
+      description: 'Trade and provide liquidity for MATIC/USDC',
     },
     {
       id: 'quickswap-eth-usdc',
       name: 'ETH-USDC',
-      token: 'ETH/USDC',
+      tokenName: 'ETH/USDC',
       address: '0x853Ee4b2A13f8a742d64C8F088bE7bA2131f670d' as `0x${string}`,
-      description: 'Trade and provide liquidity for ETH/USDC'
+      description: 'Trade and provide liquidity for ETH/USDC',
     },
     {
       id: 'quickswap-wbtc-eth',
       name: 'WBTC-ETH',
-      token: 'WBTC/ETH',
+      tokenName: 'WBTC/ETH',
       address: '0xdC9232E2Df177d7a12FdFf6EcBAb114E2231198D' as `0x${string}`,
-      description: 'Trade and provide liquidity for WBTC/ETH'
-    }
-  ]
+      description: 'Trade and provide liquidity for WBTC/ETH',
+    },
+  ],
 }
 
 // All available protocols
