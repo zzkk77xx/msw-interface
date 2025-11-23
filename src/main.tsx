@@ -18,11 +18,14 @@ import { sepolia } from 'viem/chains'
 const queryClient = new QueryClient()
 
 const SafeProviderWrapper = () => {
-  const { address } = useAccount()
+  const { address, chain, chainId } = useAccount()
+
+  const provider = chainId === sepolia.id ? 'https://sepolia.drpc.org' : 'https://polygon-rpc.com'
+
   const safeConfig = createConfig({
-    chain: sepolia,
+    chain: chain || sepolia,
     // sepolia rpc
-    provider: 'https://sepolia.drpc.org',
+    provider,
     signer: address,
   })
   return (
